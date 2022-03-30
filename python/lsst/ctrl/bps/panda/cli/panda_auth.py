@@ -31,7 +31,7 @@ from lsst.daf.butler.cli.opt import (
 
 class PandaAuthCli(LoaderCLI):
 
-    localCmdPkg = "lsst.ctrl.bps.wms.panda.cli.cmd"
+    localCmdPkg = "lsst.ctrl.bps.panda.cli.cmd"
 
 
 @click.command(cls=PandaAuthCli, context_settings=dict(help_option_names=["-h", "--help"]), epilog=None)

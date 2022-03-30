@@ -54,7 +54,7 @@ class PanDAService(BaseWmsService):
 
         Returns
         ----------
-        workflow : `lsst.ctrl.bps.wms.panda.panda_service.PandaBpsWmsWorkflow`
+        workflow : `lsst.ctrl.bps.panda.panda_service.PandaBpsWmsWorkflow`
             PanDA workflow ready to be run.
         """
         _LOG.debug("out_prefix = '%s'", out_prefix)
