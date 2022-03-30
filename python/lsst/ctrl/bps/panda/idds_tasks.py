@@ -22,7 +22,7 @@ import os.path
 from dataclasses import dataclass
 
 from lsst.ctrl.bps import GenericWorkflow, GenericWorkflowJob
-from lsst.ctrl.bps.wms.panda.cmd_line_embedder import CommandLineEmbedder
+from lsst.ctrl.bps.panda.cmd_line_embedder import CommandLineEmbedder
 
 
 @dataclass

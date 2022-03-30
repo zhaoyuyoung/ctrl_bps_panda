@@ -29,8 +29,8 @@ import pandaclient.idds_api
 from idds.doma.workflowv2.domapandawork import DomaPanDAWork
 from idds.workflowv2.workflow import AndCondition
 from idds.workflowv2.workflow import Workflow as IDDS_client_workflow
-from lsst.ctrl.bps.wms.panda.idds_tasks import IDDSWorkflowGenerator
-from lsst.ctrl.bps.wms.panda.panda_auth_utils import panda_auth_update
+from lsst.ctrl.bps.panda.idds_tasks import IDDSWorkflowGenerator
+from lsst.ctrl.bps.panda.panda_auth_utils import panda_auth_update
 from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow
 from lsst.resources import ResourcePath
 
