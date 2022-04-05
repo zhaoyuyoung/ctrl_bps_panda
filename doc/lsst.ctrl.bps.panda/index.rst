@@ -10,13 +10,16 @@ lsst.ctrl.bps.panda
 
 .. .. _lsst.ctrl.bps.panda-using:
 
-.. Using lsst.ctrl.bps.panda
-.. =========================
+Using lsst.ctrl.bps.panda
+=========================
 
 .. toctree linking to topics related to using the module's APIs.
 
-.. .. toctree::
-..    :maxdepth: 1
+.. toctree::
+   :maxdepth: 1
+
+   userguide.rst
+
 
 .. _lsst.ctrl.bps.panda-contributing:
 
