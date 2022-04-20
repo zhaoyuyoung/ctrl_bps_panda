@@ -53,7 +53,7 @@ class PanDAService(BaseWmsService):
             The root directory into which all WMS-specific files are written
 
         Returns
-        ----------
+        -------
         workflow : `lsst.ctrl.bps.panda.panda_service.PandaBpsWmsWorkflow`
             PanDA workflow ready to be run.
         """
@@ -66,6 +66,7 @@ class PanDAService(BaseWmsService):
 
     def convert_exec_string_to_hex(self, cmdline):
         """Convert the command line into hex representation.
+
         This step is currently involved because large blocks of command lines
         including special symbols passed to the pilot/container. To make sure
         the 1 to 1 matching and pass by the special symbol stripping
@@ -212,9 +213,7 @@ class PanDAService(BaseWmsService):
             First parameters is key values pairs
             of file placeholder - file name
             Second parameter is set of files which will be directly accessed.
-
         """
-
         local_pfns = {}
         direct_IO_files = set()
         for task in tasks:
@@ -313,6 +312,7 @@ class PanDAService(BaseWmsService):
 
 class PandaBpsWmsWorkflow(BaseWmsWorkflow):
     """A single Panda based workflow
+
     Parameters
     ----------
     name : `str`
