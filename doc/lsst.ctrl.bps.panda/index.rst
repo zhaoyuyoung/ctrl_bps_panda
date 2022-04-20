@@ -8,18 +8,25 @@ lsst.ctrl.bps.panda
 
 .. Paragraph that describes what this Python module does and links to related modules and frameworks.
 
-.. .. _lsst.ctrl.bps.panda-using:
+.. .. _lsst.ctrl.bps.panda-changes:
+
+.. Changes
+.. =======
+
+.. .. toctree::
+..   :maxdepth: 1
+
+..   CHANGES.rst
+
+.. _lsst.ctrl.bps.panda-using:
 
 Using lsst.ctrl.bps.panda
 =========================
-
-.. toctree linking to topics related to using the module's APIs.
 
 .. toctree::
    :maxdepth: 1
 
    userguide.rst
-
 
 .. _lsst.ctrl.bps.panda-contributing:
 
@@ -44,7 +51,7 @@ You can find Jira issues for this module under the `ctrl_bps_panda <https://jira
 .. .. toctree::
 ..    :maxdepth: 1
 
-.. .. _lsst.ctrl.bps.panda-pyapi:
+.. _lsst.ctrl.bps.panda-pyapi:
 
 Python API reference
 ====================
