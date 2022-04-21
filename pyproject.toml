@@ -1,5 +1,5 @@
 [tool.towncrier]
-    package = "lsst.ctrl.bps"
+    package = "lsst.ctrl.bps.panda"
     package_dir = "python"
     filename = "doc/lsst.ctrl.bps/CHANGES.rst"
     directory = "doc/changes"
