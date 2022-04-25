@@ -1,4 +1,4 @@
-# This file is part of ctrl_bps.
+# This file is part of ctrl_bps_panda.
 #
 # Developed for the LSST Data Management System.
 # This product includes software developed by the LSST Project
@@ -29,8 +29,8 @@ import pandaclient.idds_api
 from idds.doma.workflowv2.domapandawork import DomaPanDAWork
 from idds.workflowv2.workflow import AndCondition
 from idds.workflowv2.workflow import Workflow as IDDS_client_workflow
-from lsst.ctrl.bps.wms.panda.idds_tasks import IDDSWorkflowGenerator
-from lsst.ctrl.bps.wms.panda.panda_auth_utils import panda_auth_update
+from lsst.ctrl.bps.panda.idds_tasks import IDDSWorkflowGenerator
+from lsst.ctrl.bps.panda.panda_auth_utils import panda_auth_update
 from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow
 from lsst.resources import ResourcePath
 
@@ -53,8 +53,8 @@ class PanDAService(BaseWmsService):
             The root directory into which all WMS-specific files are written
 
         Returns
-        ----------
-        workflow : `lsst.ctrl.bps.wms.panda.panda_service.PandaBpsWmsWorkflow`
+        -------
+        workflow : `lsst.ctrl.bps.panda.panda_service.PandaBpsWmsWorkflow`
             PanDA workflow ready to be run.
         """
         _LOG.debug("out_prefix = '%s'", out_prefix)
@@ -66,6 +66,7 @@ class PanDAService(BaseWmsService):
 
     def convert_exec_string_to_hex(self, cmdline):
         """Convert the command line into hex representation.
+
         This step is currently involved because large blocks of command lines
         including special symbols passed to the pilot/container. To make sure
         the 1 to 1 matching and pass by the special symbol stripping
@@ -212,9 +213,7 @@ class PanDAService(BaseWmsService):
             First parameters is key values pairs
             of file placeholder - file name
             Second parameter is set of files which will be directly accessed.
-
         """
-
         local_pfns = {}
         direct_IO_files = set()
         for task in tasks:
@@ -313,6 +312,7 @@ class PanDAService(BaseWmsService):
 
 class PandaBpsWmsWorkflow(BaseWmsWorkflow):
     """A single Panda based workflow
+
     Parameters
     ----------
     name : `str`

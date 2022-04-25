@@ -1,4 +1,4 @@
-# This file is part of ctrl_bps.
+# This file is part of ctrl_bps_panda.
 #
 # Developed for the LSST Data Management System.
 # This product includes software developed by the LSST Project
@@ -22,20 +22,17 @@ import os.path
 from dataclasses import dataclass
 
 from lsst.ctrl.bps import GenericWorkflow, GenericWorkflowJob
-from lsst.ctrl.bps.wms.panda.cmd_line_embedder import CommandLineEmbedder
+from lsst.ctrl.bps.panda.cmd_line_embedder import CommandLineEmbedder
 
 
 @dataclass
 class FileDescriptor:
-    """
-    Holds parameters needed to define a file used by a job of task
-    """
+    """Holds parameters needed to define a file used by a job of task"""
 
     name: str = None
     """Name of the file"""
     distribution_url: str = None
-    """URL of the location where this file to be distributed
-     to the edge node"""
+    """The location (URL) where this file to be distributed to the edge node"""
     submission_url: str = None
     """Path to file on the submission node"""
     direct_IO: bool = False
@@ -46,9 +43,7 @@ class FileDescriptor:
 
 @dataclass
 class RubinTask:
-    """
-    Holds parameters needed to define a PanDA task
-    """
+    """Holds parameters needed to define a PanDA task"""
 
     name: str = None
     """Name of the task"""
@@ -90,7 +85,6 @@ class IDDSWorkflowGenerator:
     ----------
     bps_workflow : `lsst.ctrl.bps.GenericWorkflow`
         The generic workflow constructed by BPS system
-
     config : `lsst.ctrl.bps.BpsConfig`
         BPS configuration that includes necessary submit/runtime information,
         sufficiently defined in YAML file supplied in `submit` command
@@ -382,20 +376,21 @@ class IDDSWorkflowGenerator:
         """Group nodes performing same operations into tasks. For each task
         define inputs and its dependencies.
 
-        This is a structure to be filled out in function
-        taskname: dependencies = [
-            {
-                "name": "filename0",
-                "dependencies": [
-                    {
-                        "task": "task1",
-                        "inputname":"filename0",
-                        "available": False"
-                    },
-                ],
-                "submitted": False
-            }
-        ]
+        This is a structure to be filled out in function taskname: ::
+
+            dependencies = [
+                {
+                    "name": "filename0",
+                    "dependencies": [
+                        {
+                            "task": "task1",
+                            "inputname":"filename0",
+                            "available": False"
+                        },
+                    ],
+                    "submitted": False
+                }
+            ]
 
         Parameters
         ----------
@@ -431,7 +426,6 @@ class IDDSWorkflowGenerator:
         -------
         dependencies_by_tasks : `dict` [`str`, `list`]
             Dict of tasks/dependency files comes from that task.
-
         """
         dependencies_by_tasks = {}
         for dependency in dependencies:

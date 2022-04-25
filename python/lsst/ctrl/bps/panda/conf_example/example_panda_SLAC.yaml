@@ -87,7 +87,7 @@ runQuantumCommand: "${CTRL_MPEXEC_DIR}/bin/pipetask --long-log run -b {butlerCon
 requestMemory: 2048
 requestCpus: 1
 
-wmsServiceClass: lsst.ctrl.bps.wms.panda.panda_service.PanDAService
+wmsServiceClass: lsst.ctrl.bps.panda.PanDAService
 clusterAlgorithm: lsst.ctrl.bps.quantum_clustering_funcs.single_quantum_clustering
 
 # Template for bps filenames
