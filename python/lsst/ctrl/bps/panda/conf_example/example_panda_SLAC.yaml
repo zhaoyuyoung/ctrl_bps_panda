@@ -43,7 +43,7 @@ payload:
 
   payloadFolder: payload
   fileDistributionEndPoint: "/sdf/group/lsst/software/IandT/tmp/{payloadFolder}/{uniqProcName}/"
-  runnerCommand: 'unset PYTHONPATH;export LSST_DB_AUTH=/sdf/home/l/lsstsvc1/.lsst/db-auth.yaml;source /sdf/group/lsst/software/IandT/stack-lsst_distrib-d_2021_08_03/loadLSST.bash;cd ${PILOT_HOME};pwd;ls -a;setup lsst_distrib;env;python3 ${CTRL_BPS_DIR}/python/lsst/ctrl/bps/wms/panda/edgenode/cmd_line_decoder.py _cmd_line_ '
+  runnerCommand: 'unset PYTHONPATH;export LSST_DB_AUTH=/sdf/home/l/lsstsvc1/.lsst/db-auth.yaml;source /sdf/group/lsst/software/IandT/stack-lsst_distrib-d_2021_08_03/loadLSST.bash;cd ${PILOT_HOME};pwd;ls -a;setup lsst_distrib;env;python3 ${CTRL_BPS_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_ '
 
 
 pipetask:
