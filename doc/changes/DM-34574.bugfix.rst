@@ -1,0 +1,1 @@
+Update the path to the command line decoder in the config file and the documentation.
