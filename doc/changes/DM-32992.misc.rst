@@ -1,1 +1,10 @@
+  
+Introduced a new parameter **dockerImageLocation** in the PanDA IDF configuration yaml file to pull lsst release containes from **GAR (Google Artifact Registry)**. This parameter is trailed with **'/'**, so it could be used in *sw_image* path in the following example. And the *sw_image* will still refer to the **Docker hub**, if the parameter **dockerImageLocation** is not defined, to make the *sw_image* to back compatible with previous PanDA IDF configuration yaml files.
 
+In the user bps submition yaml file, just prepend this parameter to the sw_image path, that is:
+
+.. sourcecode::
+
+   sw_image: "{dockerImageLocation}lsstsqre/centos:7-stack-lsst_distrib-w_2022_05"
+   
+Please note that there is no any extra character(s) between *{dockerImageLocation}* and *lsstsqre*.
