@@ -11,7 +11,9 @@ dockerImageLocation: "us-central1-docker.pkg.dev/panda-dev-1a74/"
 maxJobsPerTask: 70000
 
 #IDF PanDA specific settings:
+cloud: LSST
 computeSite: LSST
+
 payload:
   s3EndpointUrl: "https://storage.googleapis.com"
   payloadFolder: payload
