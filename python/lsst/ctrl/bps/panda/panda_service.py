@@ -139,6 +139,12 @@ class PanDAService(BaseWmsService):
         DAG_end_work = []
         DAG_final_work = None
 
+        working_group = self.config.search("working_group", opt={"default": 'lsst'})
+        processing_type = self.config.search("processing_type", opt={"default": None})
+        task_type = self.config.search("task_type", opt={"default": 'test'})
+        prodSourceLabel = self.config.search("prodSourceLabel", opt={"default": 'managed'})
+        vo = self.config.search("vo", opt={"default": 'Rubin'})
+
         for idx, task in enumerate(workflow.generated_tasks):
             work = DomaPanDAWork(
                 executable=self.add_decoder_prefix(
@@ -166,7 +172,16 @@ class PanDAService(BaseWmsService):
                 encode_command_line=True,
                 task_rss=task.max_rss,
                 task_cloud=task.cloud,
+                task_site=task.site,
+                task_priorrity=task.priority,
+                core_count=task.core_count,
+                working_group=working_group,
+                processing_type=processing_type,
+                task_type=task_type,
+                prodSourceLabel=prodSourceLabel,
+                vo=vo,
             )
+
             idds_client_workflow.add_work(work)
             if task.is_final:
                 DAG_final_work = work
