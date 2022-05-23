@@ -1,0 +1,1 @@
+Add missing __all__ statement to make the documentation render properly at https://pipelines.lsst.io.
