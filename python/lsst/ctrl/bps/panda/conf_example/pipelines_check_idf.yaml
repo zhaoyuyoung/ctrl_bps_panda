@@ -15,4 +15,6 @@ payload:
   # Strongly recommend changing the following stack version to match
   # the version used for submission.  Different versions may
   # or may not work.
-  sw_image: "lsstsqre/centos:7-stack-lsst_distrib-d_latest"
+  # The prefix {dockerImageLocation} is the location of image in GAR (Google Artifact Registry)
+  # To use images from  the Docker hub instead, just take out the prefix {dockerImageLocation}.
+  sw_image: "{dockerImageLocation}lsstsqre/centos:7-stack-lsst_distrib-d_latest"
