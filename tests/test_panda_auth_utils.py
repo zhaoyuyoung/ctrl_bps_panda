@@ -15,7 +15,6 @@ class TestPandaAuthUtils(unittest.TestCase):
             "PANDA_AUTH_VO",
             "PANDA_URL_SSL",
             "PANDA_URL",
-            "IDDS_CONFIG",
         }
         test_environ = {key: val for key, val in os.environ.items() if key not in unwanted}
         with mock.patch.dict(os.environ, test_environ, clear=True):

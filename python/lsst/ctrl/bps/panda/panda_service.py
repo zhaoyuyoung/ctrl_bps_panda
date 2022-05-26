@@ -306,7 +306,7 @@ class PanDAService(BaseWmsService):
         Any exception other than NotImplementedError will halt submission.
         Submit directory may not yet exist when this is called.
         """
-        for key in ["PANDA_URL", "IDDS_CONFIG"]:
+        for key in ["PANDA_URL"]:
             if key not in os.environ:
                 raise OSError(f"Missing environment variable {key}")
 
