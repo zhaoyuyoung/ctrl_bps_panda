@@ -179,10 +179,11 @@ class IDDSWorkflowGenerator:
             )
             bps_node = self.bps_workflow.get_job(picked_job_name)
             task.queue = bps_node.queue
-            task.cloud = bps_node.cloud
+            task.cloud = bps_node.compute_cloud
             task.site = bps_node.compute_site
             task.core_count = bps_node.request_cpus
             task.priority = bps_node.priority
+            task.working_group = bps_node.accounting_group
             task.jobs_pseudo_inputs = list(jobs)
             task.max_attempt = self.number_of_retries.get(task_name, 3)
             task.max_walltime = self.max_walltime
