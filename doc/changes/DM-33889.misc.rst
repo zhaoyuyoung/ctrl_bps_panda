@@ -1,0 +1,3 @@
+PanDA cloud was mapped from BPS compute site, fixed it.
+Pass BPS cloud to PanDA cloud.
+Add supports for task priority, vo, working group, prodSourceLabel.
