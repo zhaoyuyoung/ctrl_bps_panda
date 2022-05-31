@@ -140,9 +140,9 @@ class PanDAService(BaseWmsService):
         DAG_final_work = None
 
         _, processing_type = self.config.search("processing_type", opt={"default": None})
-        _, task_type = self.config.search("task_type", opt={"default": 'test'})
-        _, prodSourceLabel = self.config.search("prodSourceLabel", opt={"default": 'test'})
-        _, vo = self.config.search("vo", opt={"default": 'wlcg'})
+        _, task_type = self.config.search("task_type", opt={"default": "test"})
+        _, prodSourceLabel = self.config.search("prodSourceLabel", opt={"default": "test"})
+        _, vo = self.config.search("vo", opt={"default": "wlcg"})
 
         for idx, task in enumerate(workflow.generated_tasks):
             work = DomaPanDAWork(

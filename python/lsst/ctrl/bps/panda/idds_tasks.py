@@ -75,10 +75,10 @@ class RubinTask:
     """Task processing type such as simulation, reconstruction"""
     task_type: str = None
     """The type of the task, such as production, analysis"""
-    prodSourceLabel: str = 'managed'
+    prodSourceLabel: str = "managed"
     """Label to manage production jobs and test jobs. Its value
      can be 'managed' and 'test'"""
-    vo: str = 'Rubin'
+    vo: str = "Rubin"
     """Virtual organization name"""
     jobs_pseudo_inputs: list = None
     """Name of preudo input to be used by task and defining jobs"""
