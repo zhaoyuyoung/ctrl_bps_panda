@@ -141,7 +141,7 @@ class PanDAService(BaseWmsService):
 
         _, processing_type = self.config.search("processing_type", opt={"default": None})
         _, task_type = self.config.search("task_type", opt={"default": "test"})
-        _, prodSourceLabel = self.config.search("prodSourceLabel", opt={"default": "test"})
+        _, prod_source_label = self.config.search("prod_source_label", opt={"default": "test"})
         _, vo = self.config.search("vo", opt={"default": "wlcg"})
 
         for idx, task in enumerate(workflow.generated_tasks):
@@ -177,8 +177,10 @@ class PanDAService(BaseWmsService):
                 working_group=task.working_group,
                 processing_type=processing_type,
                 task_type=task_type,
-                prodSourceLabel=prodSourceLabel,
+                prodSourceLabel=task.prod_source_label if task.prod_source_label else prod_source_label,
                 vo=vo,
+                maxattempt=task.max_attempt,
+                maxwalltime=task.max_walltime if task.max_walltime else 90000,
             )
 
             idds_client_workflow.add_work(work)

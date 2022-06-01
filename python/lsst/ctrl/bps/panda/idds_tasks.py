@@ -69,13 +69,13 @@ class RubinTask:
     """Number of CPU cores to be used by a job"""
     working_group: str = None
     """Group for accounting"""
-    priority: int = 900
+    priority: int = 0
     """Task priority"""
     processing_type: str = None
     """Task processing type such as simulation, reconstruction"""
     task_type: str = None
     """The type of the task, such as production, analysis"""
-    prodSourceLabel: str = "managed"
+    prod_source_label: str = "managed"
     """Label to manage production jobs and test jobs. Its value
      can be 'managed' and 'test'"""
     vo: str = "Rubin"
@@ -185,8 +185,15 @@ class IDDSWorkflowGenerator:
             task.priority = bps_node.priority
             task.working_group = bps_node.accounting_group
             task.jobs_pseudo_inputs = list(jobs)
-            task.max_attempt = self.number_of_retries.get(task_name, 3)
-            task.max_walltime = self.max_walltime
+            task.max_attempt = self.number_of_retries if self.number_of_retries else 3
+            if bps_node.number_of_retries:
+                task.max_attempt = bps_node.number_of_retries
+            else:
+                task.max_attempt = self.number_of_retries.get(task_name, 3)
+            if bps_node.request_walltime:
+                task.max_walltime = bps_node.request_walltime
+            else:
+                task.max_walltime = self.max_walltime
             task.max_rss = bps_node.request_memory
             task.executable = self.tasks_cmd_lines[task_name]
             task.files_used_by_task = self.fill_input_files(task_name)

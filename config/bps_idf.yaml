@@ -10,7 +10,10 @@ dockerImageLocation: "us-central1-docker.pkg.dev/panda-dev-1a74/"
 # Limit the number of jobs in a single PanDA task
 maxJobsPerTask: 70000
 
-#IDF PanDA specific settings:
+# IDF PanDA specific settings:
+# One cloud can have multiple sites. One site can have multiple queues.
+# For LSST cloud, there is one one site LSST.
+# If there are multiple sites in a cloud, computeSite can be used.
 computeCloud: "LSST"
 # computeSite: "LSST"
 
@@ -21,7 +24,7 @@ payload:
 
 #SLAC PanDA specific settings:
 #computingCloud: US
-#queue: DOMA_LSST_SLAC_TEST
+#computingSite: DOMA_LSST_SLAC_TEST
 
 
 executionButler:
