@@ -24,7 +24,7 @@ payload:
 
 #SLAC PanDA specific settings:
 #computingCloud: US
-#computingSite: DOMA_LSST_SLAC_TEST
+#computeSite: DOMA_LSST_SLAC_TEST
 
 
 executionButler:
