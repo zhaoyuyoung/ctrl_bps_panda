@@ -34,9 +34,11 @@ import pandaclient.idds_api
 from idds.doma.workflowv2.domapandawork import DomaPanDAWork
 from idds.workflowv2.workflow import AndCondition
 from idds.workflowv2.workflow import Workflow as IDDS_client_workflow
+from lsst.ctrl.bps.bps_config import BpsConfig
 from lsst.ctrl.bps.panda.idds_tasks import IDDSWorkflowGenerator
 # from lsst.ctrl.bps.panda.panda_auth_utils import panda_auth_update
-from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow, WmsRunReport
+from lsst.ctrl.bps.wms_service import (BaseWmsService, BaseWmsWorkflow,
+                                       WmsRunReport, WmsStates)
 from lsst.resources import ResourcePath
 
 _LOG = logging.getLogger(__name__)
@@ -289,7 +291,11 @@ class PanDAService(BaseWmsService):
         -------
         idds_client: `iDDS client manager object`
         """
-        _, idds_server = self.config.search("iddsServer", opt={"default": None})
+        idds_server = None
+        if type(self.config) in [BpsConfig]:
+            _, idds_server = self.config.search("iddsServer", opt={"default": None})
+        elif type(self.config) in [dict] and 'iddsServer' in self.config:
+            idds_server = self.config['iddsServer']
         idds_client = pandaclient.idds_api.get_api(
             idds_utils.json_dumps, idds_host=idds_server, compress=True, manager=True
         )
@@ -318,15 +324,52 @@ class PanDAService(BaseWmsService):
         ret = c.retry(request_id=wms_workflow_id)
         _LOG.debug("Retry PanDA workflow returned = %s", str(ret))
 
+        rets = []
         success = True
-        if ret[0] == 0:
-            if type(ret[1][0]) in [int] and ret[1][0] != 0:
-                success = False
-            elif type(ret[1][0]) in [tuple, list]:
-                for req in ret[1]:
+        if ret[0] == 0 and ret[1][0]:
+
+            for req in ret[1][1]:
+                if type(req) in [tuple, list]:
+                    if req[0] == 0:
+                        _LOG.info(req[1])
+                        rets.append(req[1])
+                    else:
+                        _LOG.error(req[1])
+                        rets.append(req[1])
+                else:
                     _LOG.info(req)
+                    rets.append(req)
         if not success:
-            raise RuntimeError(f"Error to abort workflow: {str(ret)}")
+            raise RuntimeError(f"Error to retry workflow: {str(ret)}")
+        return True, None, json.dumps(rets)
+
+    def convert_idds_state_to_wms_state(self, state):
+        """Convert iDDS state to BPS wms state
+        Parameters
+        ----------
+        state : `str`:
+            iDDS task state.
+
+        Returns
+        -------
+        wms_state: `WmsStates`
+            BPS wms state
+        """
+        if state in ['New']:
+            wms_state = WmsStates.UNREADY
+        elif state in ['Ready']:
+            wms_state = WmsStates.READY
+        elif state in ['Transforming']:
+            wms_state = WmsStates.RUNNING
+        elif state in ['Finished', 'SubFinished']:
+            wms_state = WmsStates.SUCCEEDED
+        elif state in ['Cancelled', 'Suspended']:
+            wms_state = WmsStates.HELD
+        elif state in ['Failed', 'Expired']:
+            wms_state = WmsStates.FAILED
+        else:
+            wms_state = WmsStates.UNKNOWN
+        return wms_state
 
     def report(self, wms_workflow_id=None, user=None, hist=0, pass_thru=None, is_global=False):
         """Stub for future implementation of the report method
@@ -363,17 +406,33 @@ class PanDAService(BaseWmsService):
         _LOG.debug("PanDA get workflow status returned = %s", str(ret))
 
         success = False
-        if ret[0] == 0:
-            for req in ret[1]:
-                wms_report = WmsRunReport()
-                wms_report.wms_id = req['request_id']
-                wms_report.global_wms_id = req['transform_workload_id']
-                wms_report.operator = req['username']
-                wms_report.run = req['name']
-                wms_report.state = req['transform_status'].name
-                wms_report.total_number_jobs = req['output_total_files']
-                wms_report.job_state_counts = {'processed': req['output_processed_files'],
-                                               'processing': req['output_processing_files']}
+        if ret[0] == 0 and ret[1][0]:
+            reqs = ret[1][1]
+            for req in reqs:
+                transform_status = req['transform_status']['attributes']['_name_']
+                wms_state = self.convert_idds_state_to_wms_state(transform_status)
+                job_state_counts = {}
+                for state in WmsStates:
+                    job_state_counts[state] = 0
+                job_state_counts[WmsStates.SUCCEEDED] = req['output_processed_files']
+                job_state_counts[WmsStates.RUNNING] = req['output_processing_files']
+                report = {"wms_id": str(req['request_id']),
+                          "global_wms_id": None,
+                          "path": None,
+                          "label": None,
+                          "run": str(req['transform_workload_id']),
+                          "project": "Rubin",
+                          "campaign": "Rubin",
+                          "payload": req['name'],
+                          "operator": req['username'],
+                          "run_summary": None,
+                          "state": wms_state,
+                          "total_number_jobs": req['output_total_files'],
+                          "jobs": [],
+                          "job_state_counts": job_state_counts,
+                          }
+
+                wms_report = WmsRunReport(**report)
                 run_reports.append(wms_report)
                 success = True
 
@@ -381,6 +440,54 @@ class PanDAService(BaseWmsService):
             raise RuntimeError(f"Error to get workflow status: {str(ret)}")
 
         return run_reports, message
+
+    def list_submitted_jobs(self, wms_id=None, user=None, require_bps=True, pass_thru=None, is_global=False):
+        """Query WMS for list of submitted WMS workflows/jobs.
+
+        This should be a quick lookup function to create list of jobs for
+        other functions.
+
+        Parameters
+        ----------
+        wms_id : `int` or `str`, optional
+            Id or path that can be used by WMS service to look up job.
+        user : `str`, optional
+            User whose submitted jobs should be listed.
+        require_bps : `bool`, optional
+            Whether to require jobs returned in list to be bps-submitted jobs.
+        pass_thru : `str`, optional
+            Information to pass through to WMS.
+        is_global : `bool`, optional
+            If set, all available job queues will be queried for job
+            information.  Defaults to False which means that only a local job
+            queue will be queried for information.
+
+            Only applicable in the context of a WMS using distributed job
+            queues (e.g., HTCondor). A WMS with a centralized job queue
+            (e.g. PanDA) can safely ignore it.
+
+        Returns
+        -------
+        req_ids : `list` [`Any`]
+            Only job ids to be used by cancel and other functions.  Typically
+            this means top-level jobs (i.e., not children jobs).
+        """
+        c = self.get_idds_client()
+        ret = c.get_requests(request_id=wms_id)
+        _LOG.debug("PanDA get workflows returned = %s", str(ret))
+
+        req_ids = []
+        success = False
+        if ret[0] == 0 and ret[1][0]:
+            reqs = ret[1][1]
+            for req in reqs:
+                req_ids.append(req['request_id'])
+                success = True
+
+        if not success:
+            raise RuntimeError(f"Error to get workflows: {str(ret)}")
+
+        return req_ids
 
     def cancel(self, wms_id, pass_thru=None):
         """Cancel submitted workflows/jobs.
@@ -402,15 +509,23 @@ class PanDAService(BaseWmsService):
         ret = c.abort(request_id=wms_id)
         _LOG.debug("Abort PanDA workflow returned = %s", str(ret))
 
+        rets = []
         success = True
-        if ret[0] == 0:
-            if type(ret[1][0]) in [int] and ret[1][0] != 0:
-                success = False
-            elif type(ret[1][0]) in [tuple, list]:
-                for req in ret[1]:
+        if ret[0] == 0 and ret[1][0]:
+            for req in ret[1][1]:
+                if type(req) in [tuple, list]:
+                    if req[0] == 0:
+                        _LOG.info(req[1])
+                        rets.append(req[1])
+                    else:
+                        _LOG.error(req[1])
+                        rets.append(req[1])
+                else:
                     _LOG.info(req)
+                    rets.append(req)
         if not success:
             raise RuntimeError(f"Error to abort workflow: {str(ret)}")
+        return True, json.dumps(rets)
 
     def ping(self):
         """Ping iDDS server.
@@ -427,8 +542,8 @@ class PanDAService(BaseWmsService):
         # Check submission success
         # https://panda-wms.readthedocs.io/en/latest/client/rest_idds.html
         if ret[0] == 0 and ret[1][0]:
-            ret_status = json.loads(ret[1][1])
-            if 'status' in ret_status and ret_status['status'] == 'OK':
+            ret_status = ret[1][1]
+            if 'Status' in ret_status and ret_status['Status'] == 'OK':
                 success = True
         if not success:
             raise RuntimeError(f"Error to ping PanDA service: {str(ret)}")
