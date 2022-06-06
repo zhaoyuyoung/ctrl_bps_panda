@@ -286,7 +286,7 @@ class PanDAService(BaseWmsService):
         return files_plc_hldr, direct_IO_files
 
     def get_idds_client(self):
-        """ Get the idds client
+        """Get the idds client
         Returns
         -------
         idds_client: `iDDS client manager object`
@@ -416,21 +416,22 @@ class PanDAService(BaseWmsService):
                     job_state_counts[state] = 0
                 job_state_counts[WmsStates.SUCCEEDED] = req["output_processed_files"]
                 job_state_counts[WmsStates.RUNNING] = req["output_processing_files"]
-                report = {"wms_id": str(req["request_id"]),
-                          "global_wms_id": None,
-                          "path": None,
-                          "label": None,
-                          "run": str(req["transform_workload_id"]),
-                          "project": "Rubin",
-                          "campaign": "Rubin",
-                          "payload": req["name"],
-                          "operator": req["username"],
-                          "run_summary": None,
-                          "state": wms_state,
-                          "total_number_jobs": req["output_total_files"],
-                          "jobs": [],
-                          "job_state_counts": job_state_counts,
-                          }
+                report = {
+                    "wms_id": str(req["request_id"]),
+                    "global_wms_id": None,
+                    "path": None,
+                    "label": None,
+                    "run": str(req["transform_workload_id"]),
+                    "project": "Rubin",
+                    "campaign": "Rubin",
+                    "payload": req["name"],
+                    "operator": req["username"],
+                    "run_summary": None,
+                    "state": wms_state,
+                    "total_number_jobs": req["output_total_files"],
+                    "jobs": [],
+                    "job_state_counts": job_state_counts,
+                }
 
                 wms_report = WmsRunReport(**report)
                 run_reports.append(wms_report)
