@@ -294,8 +294,8 @@ class PanDAService(BaseWmsService):
         idds_server = None
         if type(self.config) in [BpsConfig]:
             _, idds_server = self.config.search("iddsServer", opt={"default": None})
-        elif type(self.config) in [dict] and 'iddsServer' in self.config:
-            idds_server = self.config['iddsServer']
+        elif type(self.config) in [dict] and "iddsServer" in self.config:
+            idds_server = self.config["iddsServer"]
         idds_client = pandaclient.idds_api.get_api(
             idds_utils.json_dumps, idds_host=idds_server, compress=True, manager=True
         )
@@ -355,17 +355,17 @@ class PanDAService(BaseWmsService):
         wms_state: `WmsStates`
             BPS wms state
         """
-        if state in ['New']:
+        if state in ["New"]:
             wms_state = WmsStates.UNREADY
-        elif state in ['Ready']:
+        elif state in ["Ready"]:
             wms_state = WmsStates.READY
-        elif state in ['Transforming']:
+        elif state in ["Transforming"]:
             wms_state = WmsStates.RUNNING
-        elif state in ['Finished', 'SubFinished']:
+        elif state in ["Finished", "SubFinished"]:
             wms_state = WmsStates.SUCCEEDED
-        elif state in ['Cancelled', 'Suspended']:
+        elif state in ["Cancelled", "Suspended"]:
             wms_state = WmsStates.HELD
-        elif state in ['Failed', 'Expired']:
+        elif state in ["Failed", "Expired"]:
             wms_state = WmsStates.FAILED
         else:
             wms_state = WmsStates.UNKNOWN
@@ -409,25 +409,25 @@ class PanDAService(BaseWmsService):
         if ret[0] == 0 and ret[1][0]:
             reqs = ret[1][1]
             for req in reqs:
-                transform_status = req['transform_status']['attributes']['_name_']
+                transform_status = req["transform_status"]["attributes"]["_name_"]
                 wms_state = self.convert_idds_state_to_wms_state(transform_status)
                 job_state_counts = {}
                 for state in WmsStates:
                     job_state_counts[state] = 0
-                job_state_counts[WmsStates.SUCCEEDED] = req['output_processed_files']
-                job_state_counts[WmsStates.RUNNING] = req['output_processing_files']
-                report = {"wms_id": str(req['request_id']),
+                job_state_counts[WmsStates.SUCCEEDED] = req["output_processed_files"]
+                job_state_counts[WmsStates.RUNNING] = req["output_processing_files"]
+                report = {"wms_id": str(req["request_id"]),
                           "global_wms_id": None,
                           "path": None,
                           "label": None,
-                          "run": str(req['transform_workload_id']),
+                          "run": str(req["transform_workload_id"]),
                           "project": "Rubin",
                           "campaign": "Rubin",
-                          "payload": req['name'],
-                          "operator": req['username'],
+                          "payload": req["name"],
+                          "operator": req["username"],
                           "run_summary": None,
                           "state": wms_state,
-                          "total_number_jobs": req['output_total_files'],
+                          "total_number_jobs": req["output_total_files"],
                           "jobs": [],
                           "job_state_counts": job_state_counts,
                           }
@@ -481,7 +481,7 @@ class PanDAService(BaseWmsService):
         if ret[0] == 0 and ret[1][0]:
             reqs = ret[1][1]
             for req in reqs:
-                req_ids.append(req['request_id'])
+                req_ids.append(req["request_id"])
                 success = True
 
         if not success:
@@ -543,7 +543,7 @@ class PanDAService(BaseWmsService):
         # https://panda-wms.readthedocs.io/en/latest/client/rest_idds.html
         if ret[0] == 0 and ret[1][0]:
             ret_status = ret[1][1]
-            if 'Status' in ret_status and ret_status['Status'] == 'OK':
+            if "Status" in ret_status and ret_status["Status"] == "OK":
                 success = True
         if not success:
             raise RuntimeError(f"Error to ping PanDA service: {str(ret)}")
