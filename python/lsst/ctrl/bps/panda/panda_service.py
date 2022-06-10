@@ -199,7 +199,7 @@ class PanDAService(BaseWmsService):
             idds_client_workflow.add_condition(and_cond)
         idds_client = self.get_idds_client()
         ret = idds_client.submit(idds_client_workflow, username=None, use_dataset_name=False)
-        _LOG.debug("iDDS client manager submit returned = %s", str(ret))
+        _LOG.debug("iDDS client manager submit returned = %s", ret)
 
         # Check submission success
         status, result, error = self.get_idds_result(ret)
@@ -356,17 +356,17 @@ class PanDAService(BaseWmsService):
         -------
         wms_id : `str`
             Id of the restarted workflow. If restart failed, it will be set
-            to None.
+            to `None`.
         run_name : `str`
             Name of the restarted workflow. If restart failed, it will be set
-            to None.
+            to `None`.
         message : `str`
             A message describing any issues encountered during the restart.
             If there were no issue, an empty string is returned.
         """
         idds_client = self.get_idds_client()
         ret = idds_client.retry(request_id=wms_workflow_id)
-        _LOG.debug("Retry PanDA workflow returned = %s", str(ret))
+        _LOG.debug("Retry PanDA workflow returned = %s", ret)
 
         status, result, error = self.get_idds_result(ret)
         if status:
@@ -435,7 +435,7 @@ class PanDAService(BaseWmsService):
 
         idds_client = self.get_idds_client()
         ret_requests = idds_client.get_requests(request_id=wms_workflow_id, with_detail=True)
-        _LOG.debug("PanDA get workflow status returned = %s", str(ret_requests))
+        _LOG.debug("PanDA get workflow status returned = %s", ret_requests)
 
         status, result, error = self.get_idds_result(ret_requests)
         if status:
@@ -447,9 +447,8 @@ class PanDAService(BaseWmsService):
                 else:
                     wms_state = WmsStates.UNREADY
 
-                job_state_counts = {}
-                for state in WmsStates:
-                    job_state_counts[state] = 0
+                job_state_counts = {state: 0 for state in WmsStates}
+
                 job_state_counts[WmsStates.SUCCEEDED] = req["output_processed_files"]
                 job_state_counts[WmsStates.RUNNING] = req["output_processing_files"]
                 report = {
@@ -508,7 +507,7 @@ class PanDAService(BaseWmsService):
         """
         idds_client = self.get_idds_client()
         ret = idds_client.get_requests(request_id=wms_id)
-        _LOG.debug("PanDA get workflows returned = %s", str(ret))
+        _LOG.debug("PanDA get workflows returned = %s", ret)
 
         status, result, error = self.get_idds_result(ret)
         if status:
@@ -537,7 +536,7 @@ class PanDAService(BaseWmsService):
         """
         idds_client = self.get_idds_client()
         ret = idds_client.abort(request_id=wms_id)
-        _LOG.debug("Abort PanDA workflow returned = %s", str(ret))
+        _LOG.debug("Abort PanDA workflow returned = %s", ret)
 
         status, result, error = self.get_idds_result(ret)
         if status:
@@ -554,7 +553,7 @@ class PanDAService(BaseWmsService):
         """
         idds_client = self.get_idds_client()
         ret = idds_client.ping()
-        _LOG.debug("Ping PanDA service returned = %s", str(ret))
+        _LOG.debug("Ping PanDA service returned = %s", ret)
 
         status, result, error = self.get_idds_result(ret)
         if status:
