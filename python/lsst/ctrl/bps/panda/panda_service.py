@@ -366,10 +366,11 @@ class PanDAService(BaseWmsService):
         """
         idds_client = self.get_idds_client()
         ret = idds_client.retry(request_id=wms_workflow_id)
-        _LOG.debug("Retry PanDA workflow returned = %s", ret)
+        _LOG.debug("Restart PanDA workflow returned = %s", ret)
 
         status, result, error = self.get_idds_result(ret)
         if status:
+            _LOG.info("Restarting PanDA workflow %s", result)
             return wms_workflow_id, None, json.dumps(result)
         else:
             raise RuntimeError(f"Error retry PanDA workflow: {error}")
@@ -449,14 +450,16 @@ class PanDAService(BaseWmsService):
 
                 job_state_counts = {state: 0 for state in WmsStates}
 
-                job_state_counts[WmsStates.SUCCEEDED] = req["output_processed_files"]
-                job_state_counts[WmsStates.RUNNING] = req["output_processing_files"]
+                success_files = req["output_processed_files"]
+                running_files = req["output_processing_files"]
+                job_state_counts[WmsStates.SUCCEEDED] = success_files if success_files else 0
+                job_state_counts[WmsStates.RUNNING] = running_files if running_files else 0
                 report = {
                     "wms_id": str(req["request_id"]),
                     "global_wms_id": None,
                     "path": None,
                     "label": None,
-                    "run": str(req["transform_workload_id"]),
+                    "run": str(req["transform_workload_id"]) if req["transform_workload_id"] else '0',
                     "project": "Rubin",
                     "campaign": "Rubin",
                     "payload": req["name"],
@@ -540,6 +543,7 @@ class PanDAService(BaseWmsService):
 
         status, result, error = self.get_idds_result(ret)
         if status:
+            _LOG.info("Aborting PanDA workflow %s", result)
             return True, json.dumps(result)
         else:
             raise RuntimeError(f"Error abort PanDA workflow: {error}")
