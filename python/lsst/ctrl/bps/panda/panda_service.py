@@ -36,7 +36,6 @@ from idds.workflowv2.workflow import AndCondition
 from idds.workflowv2.workflow import Workflow as IDDS_client_workflow
 from lsst.ctrl.bps.bps_config import BpsConfig
 from lsst.ctrl.bps.panda.idds_tasks import IDDSWorkflowGenerator
-
 from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow, WmsRunReport, WmsStates
 from lsst.resources import ResourcePath
 
