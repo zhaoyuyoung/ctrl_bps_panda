@@ -458,7 +458,7 @@ class PanDAService(BaseWmsService):
                     "global_wms_id": None,
                     "path": None,
                     "label": None,
-                    "run": str(req["transform_workload_id"]) if req["transform_workload_id"] else '0',
+                    "run": str(req["transform_workload_id"]) if req["transform_workload_id"] else "0",
                     "project": "Rubin",
                     "campaign": "Rubin",
                     "payload": req["name"],
