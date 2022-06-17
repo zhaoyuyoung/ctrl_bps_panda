@@ -8,7 +8,7 @@ defaultPreCmdOpts: "--long-log --log-level=VERBOSE --log-file payload-log.json"
 dockerImageLocation: "us-central1-docker.pkg.dev/panda-dev-1a74/"
 
 # Limit the number of jobs in a single PanDA task
-maxJobsPerTask: 70000
+maxJobsPerTask: 30000
 
 # IDF PanDA specific settings:
 # One cloud can have multiple sites. One site can have multiple queues.
