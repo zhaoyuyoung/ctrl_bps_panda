@@ -547,12 +547,25 @@ class PanDAService(BaseWmsService):
         else:
             raise RuntimeError(f"Error abort PanDA workflow: {error}")
 
-    def ping(self):
-        """Ping iDDS server.
+    def ping(self, pass_thru=None):
+        """Checks whether PanDA WMS services are up, reachable,
+           and can authenticate if authentication is required.
+
+        The services to be checked are those needed for submit, report, cancel,
+        restart, but ping cannot guarantee whether jobs would actually run
+        successfully.  Any messages should be sent directly to the logger.
+
+        Parameters
+        ----------
+        pass_thru : `str`, optional
+            Information to pass through to WMS.
+
         Returns
         -------
-        success : `bool`
-            Whether to successfully ping the iDDS server.
+        status : `int`
+            0 for success, non-zero for failure
+        message : `str`
+            Any message from WMS (e.g., error details).
         """
         idds_client = self.get_idds_client()
         ret = idds_client.ping()
@@ -561,11 +574,11 @@ class PanDAService(BaseWmsService):
         status, result, error = self.get_idds_result(ret)
         if status:
             if "Status" in result and result["Status"] == "OK":
-                return True, None
+                return 0, None
             else:
-                raise RuntimeError(f"Error ping PanDA service: {result}")
+                return -1, "Error ping PanDA service: %s" % str(result)
         else:
-            raise RuntimeError(f"Error ping PanDA service: {error}")
+            return -1, "Error ping PanDA service: %s" % str(error)
 
     def run_submission_checks(self):
         """Checks to run at start if running WMS specific submission steps.
