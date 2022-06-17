@@ -185,7 +185,6 @@ class IDDSWorkflowGenerator:
             task.priority = bps_node.priority
             task.working_group = bps_node.accounting_group
             task.jobs_pseudo_inputs = list(jobs)
-            task.max_attempt = self.number_of_retries if self.number_of_retries else 3
             if bps_node.number_of_retries:
                 task.max_attempt = bps_node.number_of_retries
             else:
@@ -305,7 +304,11 @@ class IDDSWorkflowGenerator:
             task.step = final_job.label
             task.name = self.define_task_name(final_job.label)
             task.queue = final_job.queue
-            task.cloud = final_job.compute_site
+            task.cloud = final_job.compute_cloud
+            task.site = final_job.compute_site
+            task.core_count = final_job.request_cpus
+            task.priority = final_job.priority
+            task.working_group = final_job.accounting_group
             task.jobs_pseudo_inputs = []
 
             # This string implements empty pattern for dependencies
@@ -313,8 +316,14 @@ class IDDSWorkflowGenerator:
                 {"name": "pure_pseudoinput+qgraphNodeId:+qgraphId:", "submitted": False, "dependencies": []}
             ]
 
-            task.max_attempt = self.number_of_retries.get(task.name, 3)
-            task.max_walltime = self.max_walltime
+            if final_job.number_of_retries:
+                task.max_attempt = final_job.number_of_retries
+            else:
+                task.max_attempt = self.number_of_retries.get(task.name, 3)
+            if final_job.request_walltime:
+                task.max_walltime = final_job.request_walltime
+            else:
+                task.max_walltime = self.max_walltime
             task.max_rss = final_job.request_memory
             task.files_used_by_task = [bash_file]
             task.is_final = True
