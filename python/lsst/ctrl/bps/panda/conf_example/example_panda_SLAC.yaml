@@ -2,18 +2,16 @@ pipelineYaml: "/sdf/home/j/jchiang/PanDA_testing/pipelines/cpBias.yaml"
 #  OR
 #USER qgraphFile: "/path/to/existing/file.qgraph"
 
-#PANDA plugin specific settings:
+# PANDA plugin specific settings:
 iddsServer: "https://aipanda015.cern.ch:443/idds"
 placeholderParams: ['qgraphNodeId', 'qgraphId']
 
-#IDF PanDA specific settings:
+# IDF PanDA specific settings:
 #computingCloud: LSST
 
 #SLAC PanDA specific settings:
 computingCloud: US
 computeSite: DOMA_LSST_SLAC_TEST
-
-
 
 # At minimum, following group used in bps report and can be
 # used in WMS queries.  Users can use in other things such as "output".
@@ -34,7 +32,25 @@ payload:
 
   butlerConfig: /sdf/group/lsst/camera/IandT/repo_gen3/panda_test_repo
   inCollection: LSSTCam/raw/all,LSSTCam/calib
-  exposureList: "(3020111900015,3020111900016,3020111900017,3020111900018,3020111900019,3020111900020,3020111900021,3020111900022,3020111900023,3020111900024,3020111900025,3020111900026,3020111900027,3020111900028,3020111900029,3020111900030)"
+  exposureList: >
+    (
+    3020111900015,
+    3020111900016,
+    3020111900017,
+    3020111900018,
+    3020111900019,
+    3020111900020,
+    3020111900021,
+    3020111900022,
+    3020111900023,
+    3020111900024,
+    3020111900025,
+    3020111900026,
+    3020111900027,
+    3020111900028,
+    3020111900029,
+    3020111900030
+    )
   dataQuery: "instrument='LSSTCam' and exposure in {exposureList}"
 
   #USER butlerConfig: ${PIPELINES_CHECK_DIR}/DATA_REPO/butler.yaml
@@ -43,12 +59,29 @@ payload:
 
   payloadFolder: payload
   fileDistributionEndPoint: "/sdf/group/lsst/software/IandT/tmp/{payloadFolder}/{uniqProcName}/"
-  runnerCommand: 'unset PYTHONPATH;export LSST_DB_AUTH=/sdf/home/l/lsstsvc1/.lsst/db-auth.yaml;source /sdf/group/lsst/software/IandT/stack-lsst_distrib-d_2021_08_03/loadLSST.bash;cd ${PILOT_HOME};pwd;ls -a;setup lsst_distrib;env;python3 ${CTRL_BPS_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_ '
-
+  runnerCommand: >
+    unset PYTHONPATH;
+    export LSST_DB_AUTH=/sdf/home/l/lsstsvc1/.lsst/db-auth.yaml;
+    source /sdf/group/lsst/software/IandT/stack-lsst_distrib-d_2021_08_03/loadLSST.bash;
+    cd ${PILOT_HOME};
+    pwd;
+    ls -a;
+    setup lsst_distrib;
+    env;
+    python3 ${CTRL_BPS_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_
 
 pipetask:
   pipetaskInit:
-    runQuantumCommand: '${CTRL_MPEXEC_DIR}/bin/pipetask --long-log run -b {butlerConfig} -i {inCollection} --output-run {outputRun} --init-only --register-dataset-types --qgraph {fileDistributionEndPoint}/{qgraphFile} --clobber-outputs --no-versions --extend-run'
+    runQuantumCommand: >
+      ${CTRL_MPEXEC_DIR}/bin/pipetask
+      --long-log run
+      -b {butlerConfig}
+      -i {inCollection}
+      --output-run {outputRun}
+      --init-only
+      --register-dataset-types
+      --qgraph {fileDistributionEndPoint}/{qgraphFile}
+      --clobber-outputs --no-versions --extend-run
 
   #OPT myTask:
   #OPT   requestCpus:
@@ -62,12 +95,20 @@ pipetask:
 executionButler:
   whenCreate: "SUBMIT"
   #USER executionButlerDir: "/my/exec/butler/dir"  # if user provided, otherwise uses executionButlerTemplate
-  createCommand: "${CTRL_MPEXEC_DIR}/bin/pipetask qgraph -b {butlerConfig} --input {inCollection} --output-run {outputRun} --save-execution-butler {executionButlerDir} -g {qgraphFile}"
+  createCommand: >
+    ${CTRL_MPEXEC_DIR}/bin/pipetask qgraph
+    -b {butlerConfig}
+    --input {inCollection}
+    --output-run {outputRun}
+    --save-execution-butler {executionButlerDir}
+    -g {qgraphFile}
 
   whenMerge: "ALWAYS"
   implementation: JOB  # JOB, WORKFLOW
   concurrencyLimit: db_limit
-  command1: "${DAF_BUTLER_DIR}/bin/butler --log-level=VERBOSE transfer-datasets  {executionButlerDir} {butlerConfig} --collections {outputRun} --register-dataset-types"
+  command1: >
+    ${DAF_BUTLER_DIR}/bin/butler --log-level=VERBOSE transfer-datasets {executionButlerDir} {butlerConfig}
+    --collections {outputRun} --register-dataset-types"
   command2: "${DAF_BUTLER_DIR}/bin/butler collection-chain {butlerConfig} {output} {outputRun} --mode=prepend"
 
   # For --replace-run behavior need to run two collection-chain commands:
@@ -77,12 +118,50 @@ executionButler:
 # Default commands and usage requests for creating QuantumGraph, running Quantum.
 # Defaults to using full workflow QuantumGraph instead of per-job QuantumGraphs.
 whenSaveJobQgraph: "NEVER"
-createQuantumGraph: '${CTRL_MPEXEC_DIR}/bin/pipetask qgraph -d "{dataQuery}" -b {butlerConfig} -i {inCollection} -p {pipelineYaml} -q {qgraphFile} {pipelineOptions}'
-runQuantumCommand: "${CTRL_MPEXEC_DIR}/bin/pipetask --long-log run -b {butlerConfig} --output-run {outputRun} --qgraph {fileDistributionEndPoint}/{qgraphFile} --qgraph-id {qgraphId} --qgraph-node-id {qgraphNodeId} --skip-init-writes --extend-run --clobber-outputs --skip-existing"
+createQuantumGraph: >
+  ${CTRL_MPEXEC_DIR}/bin/pipetask qgraph
+  -d "{dataQuery}"
+  -b {butlerConfig}
+  -i {inCollection}
+  -p {pipelineYaml}
+  -q {qgraphFile}
+  {pipelineOptions}
+runQuantumCommand: >
+  ${CTRL_MPEXEC_DIR}/bin/pipetask
+  --long-log run
+  -b {butlerConfig}
+  --output-run {outputRun}
+  --qgraph {fileDistributionEndPoint}/{qgraphFile}
+  --qgraph-id {qgraphId}
+  --qgraph-node-id {qgraphNodeId}
+  --skip-init-writes
+  --extend-run
+  --clobber-outputs
+  --skip-existing"
 
-#createQuantumGraph: '<ENV:CTRL_MPEXEC_DIR>/bin/pipetask qgraph -d "{dataQuery}" -b {butlerConfig} -i {inCollection} --instrument {instrument} -p {pipelineYaml} -q {qgraphFile} --qgraph-dot {qgraphFile}.dot'
-#runQuantumCommand: 'export LSST_DB_AUTH=/sdf/home/l/lsstsvc1/.lsst/db-auth.yaml;<ENV:CTRL_MPEXEC_DIR>/bin/pipetask --long-log  run -b {butlerConfig} -i {inCollection} --output-run {outputRun} --extend-run --skip-init-writes --qgraph {fileDistributionEndPoint}/{payloadFolder}/{uniqProcName}/<FILE:runQgraphFile> --qgraph-id {qgraphId} --qgraph-node-id {qgraphNodeId} --clobber-outputs --skip-existing --no-versions'
-
+#createQuantumGraph: >
+#  <ENV:CTRL_MPEXEC_DIR>/bin/pipetask qgraph
+#  -d "{dataQuery}"
+#  -b {butlerConfig}
+#  -i {inCollection}
+#  --instrument {instrument}
+#  -p {pipelineYaml}
+#  -q {qgraphFile}
+#  --qgraph-dot {qgraphFile}.dot
+#runQuantumCommand: >
+#  export LSST_DB_AUTH=/sdf/home/l/lsstsvc1/.lsst/db-auth.yaml;
+#  <ENV:CTRL_MPEXEC_DIR>/bin/pipetask --long-log run
+#  -b {butlerConfig}
+#  -i {inCollection}
+#  --output-run {outputRun}
+#  --extend-run
+#  --skip-init-writes
+#  --qgraph {fileDistributionEndPoint}/{payloadFolder}/{uniqProcName}/<FILE:runQgraphFile>
+#  --qgraph-id {qgraphId}
+#  --qgraph-node-id {qgraphNodeId}
+#  --clobber-outputs
+#  --skip-existing
+#  --no-versions
 
 requestMemory: 2048
 requestCpus: 1
@@ -98,10 +177,10 @@ subDirTemplate: "{label}/{tract}/{patch}/{visit.day_obs}/{exposure.day_obs}/{ban
 templateDataId: "{tract}_{patch}_{band}_{visit}_{exposure}_{detector}"
 
 # Whether to output bps-specific intermediate files
-saveDot: False
-saveGenericWorkflow: False
-saveClusteredQgraph: False
+saveDot: false
+saveGenericWorkflow: false
+saveClusteredQgraph: false
 
 # Temporary backward-compatibility settings
-useLazyCommands: True
-useBpsShared: False
+useLazyCommands: true
+useBpsShared: false
