@@ -45,7 +45,7 @@ jobs:
 
       - name: Build and install
         run: |
-          pip install --no-deps -v -e .
+          pip install --no-deps -v .
 
       - name: Run tests
         env:
