@@ -36,7 +36,7 @@ from idds.workflowv2.workflow import AndCondition
 from idds.workflowv2.workflow import Workflow as IDDS_client_workflow
 from lsst.ctrl.bps.bps_config import BpsConfig
 from lsst.ctrl.bps.panda.idds_tasks import IDDSWorkflowGenerator
-from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow, WmsRunReport, WmsStates
+from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow
 from lsst.resources import ResourcePath
 
 _LOG = logging.getLogger(__name__)
@@ -324,12 +324,12 @@ class PanDAService(BaseWmsService):
                 Error messages.
         """
         # https://panda-wms.readthedocs.io/en/latest/client/rest_idds.html
-        if ret[0] != 0:
+        if not (isinstance(ret, tuple) or isinstance(ret, list)) or ret[0] != 0:
             # Something wrong with the PanDA relay service.
             # The call may not be delivered to iDDS.
             status = False
             result = None
-            error = "PanDA relay service returns errors: %s" % str(ret[1])
+            error = "PanDA relay service returns errors: %s" % str(ret)
         else:
             if ret[1][0]:
                 status = True
@@ -374,36 +374,6 @@ class PanDAService(BaseWmsService):
         else:
             return None, None, "Error retry PanDA workflow: %s" % str(error)
 
-    def convert_idds_state_to_wms_state(self, state):
-        """Convert iDDS state to BPS wms state
-
-        Parameters
-        ----------
-        state : `str`
-            iDDS task state.
-
-        Returns
-        -------
-        wms_state: `lsst.ctrl.bps.WmsStates`
-            BPS wms state
-        """
-        match state:
-            case "New":
-                wms_state = WmsStates.UNREADY
-            case "Ready":
-                wms_state = WmsStates.READY
-            case "Transforming":
-                wms_state = WmsStates.RUNNING
-            case "Finished" | "SubFinished":
-                wms_state = WmsStates.SUCCEEDED
-            case "Cancelled" | "Suspended":
-                wms_state = WmsStates.HELD
-            case "Failed" | "Expired":
-                wms_state = WmsStates.FAILED
-            case _:
-                wms_state = WmsStates.UNKNOWN
-        return wms_state
-
     def report(self, wms_workflow_id=None, user=None, hist=0, pass_thru=None, is_global=False):
         """Stub for future implementation of the report method
         Expected to return run information based upon given constraints.
@@ -431,56 +401,7 @@ class PanDAService(BaseWmsService):
             Extra message for report command to print.  This could be
             pointers to documentation or to WMS specific commands.
         """
-        message = ""
-        run_reports = []
-
-        if wms_workflow_id is None and user is not None:
-            msg = "Error to get workflow status report: wms_workflow_id is required"
-            msg += " and filtering worflows with 'user' is not supported."
-            return [], msg
-
-        idds_client = self.get_idds_client()
-        ret_requests = idds_client.get_requests(request_id=wms_workflow_id, with_detail=True)
-        _LOG.debug("PanDA get workflow status returned = %s", ret_requests)
-
-        status, result, error = self.get_idds_result(ret_requests)
-        if status:
-            reqs = result
-            for req in reqs:
-                if req["transform_status"]:
-                    transform_status = req["transform_status"]["attributes"]["_name_"]
-                    wms_state = self.convert_idds_state_to_wms_state(transform_status)
-                else:
-                    wms_state = WmsStates.UNREADY
-
-                job_state_counts = {state: 0 for state in WmsStates}
-
-                success_files = req["output_processed_files"]
-                running_files = req["output_processing_files"]
-                job_state_counts[WmsStates.SUCCEEDED] = success_files if success_files else 0
-                job_state_counts[WmsStates.RUNNING] = running_files if running_files else 0
-                report = {
-                    "wms_id": str(req["request_id"]),
-                    "global_wms_id": None,
-                    "path": None,
-                    "label": None,
-                    "run": str(req["transform_workload_id"]) if req["transform_workload_id"] else "0",
-                    "project": "Rubin",
-                    "campaign": "Rubin",
-                    "payload": req["name"],
-                    "operator": req["username"],
-                    "run_summary": None,
-                    "state": wms_state,
-                    "total_number_jobs": req["output_total_files"],
-                    "jobs": [],
-                    "job_state_counts": job_state_counts,
-                }
-
-                wms_report = WmsRunReport(**report)
-                run_reports.append(wms_report)
-            return run_reports, message
-        else:
-            return [], "Error to get workflow status report: %s" % str(error)
+        raise NotImplementedError
 
     def list_submitted_jobs(self, wms_id=None, user=None, require_bps=True, pass_thru=None, is_global=False):
         """Query WMS for list of submitted WMS workflows/jobs.
