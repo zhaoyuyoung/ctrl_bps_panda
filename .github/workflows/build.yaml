@@ -45,13 +45,13 @@ jobs:
 
       - name: Build and install
         run: |
-          pip install --no-deps -v .
+          pip install --no-deps -v -e .
 
       - name: Run tests
         env:
           IDDS_CONFIG: ${{ github.workspace }}/tests/idds_test.cfg
         run: |
-          pytest -r a -v --open-files
+          pytest -r a -v --open-files --cov=python --cov=tests --cov-report=xml --cov-report=term --cov-branch
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v2
         with:
