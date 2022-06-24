@@ -1,15 +1,15 @@
 pipelineYaml: "/sdf/home/j/jchiang/PanDA_testing/pipelines/cpBias.yaml"
 #  OR
-#USER qgraphFile: "/path/to/existing/file.qgraph"
+# USER qgraphFile: "/path/to/existing/file.qgraph"
 
 # PANDA plugin specific settings:
 iddsServer: "https://aipanda015.cern.ch:443/idds"
 placeholderParams: ['qgraphNodeId', 'qgraphId']
 
 # IDF PanDA specific settings:
-#computingCloud: LSST
+# computingCloud: LSST
 
-#SLAC PanDA specific settings:
+# SLAC PanDA specific settings:
 computingCloud: US
 computeSite: DOMA_LSST_SLAC_TEST
 
@@ -20,7 +20,7 @@ project: dev
 campaign: quick
 
 # Any extra site-specific settings needed for WMS
-#USER computeSite: ncsapool
+# USER computeSite: ncsapool
 
 # Make sure these values correspond to ones in the bin/run_demo.sh's
 # pipetask command line.
@@ -53,9 +53,9 @@ payload:
     )
   dataQuery: "instrument='LSSTCam' and exposure in {exposureList}"
 
-  #USER butlerConfig: ${PIPELINES_CHECK_DIR}/DATA_REPO/butler.yaml
-  #USER inCollection: HSC/calib,HSC/raw/all,refcats
-  #USER dataQuery: exposure=903342 AND detector=10
+  # USER butlerConfig: ${PIPELINES_CHECK_DIR}/DATA_REPO/butler.yaml
+  # USER inCollection: HSC/calib,HSC/raw/all,refcats
+  # USER dataQuery: exposure=903342 AND detector=10
 
   payloadFolder: payload
   fileDistributionEndPoint: "/sdf/group/lsst/software/IandT/tmp/{payloadFolder}/{uniqProcName}/"
@@ -83,18 +83,19 @@ pipetask:
       --qgraph {fileDistributionEndPoint}/{qgraphFile}
       --clobber-outputs --no-versions --extend-run
 
-  #OPT myTask:
-  #OPT   requestCpus:
-  #OPT   requestMemory:
-  #OPT   requestDisk:
-  #OPT   requestWalltime:
-  #OPT   runQuantumCommand:
-  #OPT   retries:
+  # OPT myTask:
+  # OPT   requestCpus:
+  # OPT   requestMemory:
+  # OPT   requestDisk:
+  # OPT   requestWalltime:
+  # OPT   runQuantumCommand:
+  # OPT   retries:
 
 
 executionButler:
   whenCreate: "SUBMIT"
-  #USER executionButlerDir: "/my/exec/butler/dir"  # if user provided, otherwise uses executionButlerTemplate
+  # USER executionButlerDir: "/my/exec/butler/dir"  # if user provided,
+  # otherwise uses executionButlerTemplate
   createCommand: >
     ${CTRL_MPEXEC_DIR}/bin/pipetask qgraph
     -b {butlerConfig}
@@ -112,8 +113,8 @@ executionButler:
   command2: "${DAF_BUTLER_DIR}/bin/butler collection-chain {butlerConfig} {output} {outputRun} --mode=prepend"
 
   # For --replace-run behavior need to run two collection-chain commands:
-  #command2: "${DAF_BUTLER_DIR}/bin/butler collection-chain {butlerConfig} {output} --mode=pop 1"
-  #command3: "${DAF_BUTLER_DIR}/bin/butler collection-chain {butlerConfig} {output} --mode=prepend {outputRun}"
+  # command2: "${DAF_BUTLER_DIR}/bin/butler collection-chain {butlerConfig} {output} --mode=pop 1"
+  # command3: "${DAF_BUTLER_DIR}/bin/butler collection-chain {butlerConfig} {output} --mode=prepend {outputRun}"
 
 # Default commands and usage requests for creating QuantumGraph, running Quantum.
 # Defaults to using full workflow QuantumGraph instead of per-job QuantumGraphs.
@@ -139,7 +140,7 @@ runQuantumCommand: >
   --clobber-outputs
   --skip-existing"
 
-#createQuantumGraph: >
+# createQuantumGraph: >
 #  <ENV:CTRL_MPEXEC_DIR>/bin/pipetask qgraph
 #  -d "{dataQuery}"
 #  -b {butlerConfig}
@@ -148,7 +149,7 @@ runQuantumCommand: >
 #  -p {pipelineYaml}
 #  -q {qgraphFile}
 #  --qgraph-dot {qgraphFile}.dot
-#runQuantumCommand: >
+# runQuantumCommand: >
 #  export LSST_DB_AUTH=/sdf/home/l/lsstsvc1/.lsst/db-auth.yaml;
 #  <ENV:CTRL_MPEXEC_DIR>/bin/pipetask --long-log run
 #  -b {butlerConfig}

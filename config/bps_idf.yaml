@@ -22,9 +22,9 @@ payload:
   payloadFolder: payload
   fileDistributionEndPoint: "s3://butler-us-central1-panda-dev/dc2/{payloadFolder}/{uniqProcName}/"
 
-#SLAC PanDA specific settings:
-#computingCloud: US
-#computeSite: DOMA_LSST_SLAC_TEST
+# SLAC PanDA specific settings:
+# computingCloud: US
+# computeSite: DOMA_LSST_SLAC_TEST
 
 executionButler:
   queue: "DOMA_LSST_GOOGLE_MERGE"
