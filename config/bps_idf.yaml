@@ -76,7 +76,8 @@ runnerCommand: >
   --env AWS_ACCESS_KEY_ID=$(</credentials/AWS_ACCESS_KEY_ID)
   --env AWS_SECRET_ACCESS_KEY=$(</credentials/AWS_SECRET_ACCESS_KEY)
   --env PGPASSWORD=$(</credentials/PGPASSWORD)
-  --env S3_ENDPOINT_URL=${S3_ENDPOINT_URL} {sw_image} /bin/bash -c "source /opt/lsst/software/stack/loadLSST.bash;
+  --env S3_ENDPOINT_URL=${S3_ENDPOINT_URL} {sw_image}
+  /bin/bash -c "source /opt/lsst/software/stack/loadLSST.bash;
   cd /tmp;
   ls -al;
   setup lsst_distrib;
@@ -89,5 +90,6 @@ runnerCommand: >
   python3 \${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_;" >&2;
   retStat=$?;
   ln -fs ${logDir}/prmon.txt ./memory_monitor_output.txt;
-  ln -fs ${logDir}/prmon.json ./memory_monitor_summary.json; exit $retStat
+  ln -fs ${logDir}/prmon.json ./memory_monitor_summary.json;
+  exit $retStat
 wmsServiceClass: lsst.ctrl.bps.panda.PanDAService
