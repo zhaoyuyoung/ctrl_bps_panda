@@ -435,9 +435,8 @@ class PanDAService(BaseWmsService):
             this means top-level jobs (i.e., not children jobs).
         """
         if wms_id is None and user is not None:
-            msg = "Error to get workflow status report: wms_id is required"
-            msg += " and filtering workflows with 'user' is not supported."
-            raise RuntimeError(msg)
+            raise RuntimeError("Error to get workflow status report: wms_id is required"
+                  " and filtering workflows with 'user' is not supported.")
 
         idds_client = self.get_idds_client()
         ret = idds_client.get_requests(request_id=wms_id)
