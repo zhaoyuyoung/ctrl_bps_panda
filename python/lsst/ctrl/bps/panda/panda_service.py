@@ -436,7 +436,7 @@ class PanDAService(BaseWmsService):
         """
         if wms_id is None and user is not None:
             msg = "Error to get workflow status report: wms_id is required"
-            msg += " and filtering worflows with 'user' is not supported."
+            msg += " and filtering workflows with 'user' is not supported."
             raise RuntimeError(msg)
 
         idds_client = self.get_idds_client()
