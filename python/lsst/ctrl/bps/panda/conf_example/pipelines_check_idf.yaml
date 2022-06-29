@@ -1,5 +1,5 @@
 includeConfigs:
-- ${CTRL_BPS_PANDA_DIR}/config/bps_idf.yaml
+  - ${CTRL_BPS_PANDA_DIR}/config/bps_idf.yaml
 
 project: dev
 campaign: quick

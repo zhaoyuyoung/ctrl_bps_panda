@@ -4,7 +4,14 @@ import os
 import unittest
 from unittest import mock
 
+from lsst.ctrl.bps.panda import __version__ as version
 from lsst.ctrl.bps.panda.panda_auth_utils import panda_auth_status
+
+
+class VersionTestCase(unittest.TestCase):
+    def test_version(self):
+        # Check that version is defined.
+        self.assertIsNotNone(version)
 
 
 class TestPandaAuthUtils(unittest.TestCase):

@@ -62,6 +62,24 @@ class RubinTask:
     cloud: str = None
     """Computing cloud in CRIC registry where the task should
      be submitted to"""
+    site: str = None
+    """Computing site in CRIC registry where the task should
+     be submitted to"""
+    core_count: int = 1
+    """Number of CPU cores to be used by a job"""
+    working_group: str = None
+    """Group for accounting"""
+    priority: int = 0
+    """Task priority"""
+    processing_type: str = None
+    """Task processing type such as simulation, reconstruction"""
+    task_type: str = None
+    """The type of the task, such as production, analysis"""
+    prod_source_label: str = "managed"
+    """Label to manage production jobs and test jobs. Its value
+     can be 'managed' and 'test'"""
+    vo: str = "Rubin"
+    """Virtual organization name"""
     jobs_pseudo_inputs: list = None
     """Name of preudo input to be used by task and defining jobs"""
     files_used_by_task: list = None
@@ -161,10 +179,20 @@ class IDDSWorkflowGenerator:
             )
             bps_node = self.bps_workflow.get_job(picked_job_name)
             task.queue = bps_node.queue
-            task.cloud = bps_node.compute_site
+            task.cloud = bps_node.compute_cloud
+            task.site = bps_node.compute_site
+            task.core_count = bps_node.request_cpus
+            task.priority = bps_node.priority
+            task.working_group = bps_node.accounting_group
             task.jobs_pseudo_inputs = list(jobs)
-            task.max_attempt = self.number_of_retries.get(task_name, 3)
-            task.max_walltime = self.max_walltime
+            if bps_node.number_of_retries:
+                task.max_attempt = bps_node.number_of_retries
+            else:
+                task.max_attempt = self.number_of_retries.get(task_name, 3)
+            if bps_node.request_walltime:
+                task.max_walltime = bps_node.request_walltime
+            else:
+                task.max_walltime = self.max_walltime
             task.max_rss = bps_node.request_memory
             task.executable = self.tasks_cmd_lines[task_name]
             task.files_used_by_task = self.fill_input_files(task_name)
@@ -276,7 +304,11 @@ class IDDSWorkflowGenerator:
             task.step = final_job.label
             task.name = self.define_task_name(final_job.label)
             task.queue = final_job.queue
-            task.cloud = final_job.compute_site
+            task.cloud = final_job.compute_cloud
+            task.site = final_job.compute_site
+            task.core_count = final_job.request_cpus
+            task.priority = final_job.priority
+            task.working_group = final_job.accounting_group
             task.jobs_pseudo_inputs = []
 
             # This string implements empty pattern for dependencies
@@ -284,8 +316,14 @@ class IDDSWorkflowGenerator:
                 {"name": "pure_pseudoinput+qgraphNodeId:+qgraphId:", "submitted": False, "dependencies": []}
             ]
 
-            task.max_attempt = self.number_of_retries.get(task.name, 3)
-            task.max_walltime = self.max_walltime
+            if final_job.number_of_retries:
+                task.max_attempt = final_job.number_of_retries
+            else:
+                task.max_attempt = self.number_of_retries.get(task.name, 3)
+            if final_job.request_walltime:
+                task.max_walltime = final_job.request_walltime
+            else:
+                task.max_walltime = self.max_walltime
             task.max_rss = final_job.request_memory
             task.files_used_by_task = [bash_file]
             task.is_final = True
