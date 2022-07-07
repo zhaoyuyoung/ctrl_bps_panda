@@ -1,0 +1,1 @@
+Add cancel, restart, report and ping functions in bps panda plugin.
