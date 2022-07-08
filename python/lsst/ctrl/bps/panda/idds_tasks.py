@@ -391,10 +391,11 @@ class IDDSWorkflowGenerator:
                     "job pseudo input file name contains more than 4000 symbols. Can not proceed."
                 )
 
-            self.tasks_cmd_lines[self.define_task_name(gwjob.label)] = cmd_line
+            task_name_for_label = self.define_task_name(gwjob.label)
+            self.tasks_cmd_lines[task_name_for_label] = cmd_line
             self.jobs_steps[pseudo_file_name] = gwjob.label
             if gwjob.number_of_retries:
-                self.number_of_retries[self.define_task_name(gwjob.label)] = gwjob.number_of_retries
+                self.number_of_retries[task_name_for_label] = gwjob.number_of_retries
             dependency_map[pseudo_file_name] = []
             predecessors = self.bps_workflow.predecessors(job_name)
             for parent_name in predecessors:
