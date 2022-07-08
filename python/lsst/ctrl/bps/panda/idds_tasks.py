@@ -393,7 +393,8 @@ class IDDSWorkflowGenerator:
 
             self.tasks_cmd_lines[self.define_task_name(gwjob.label)] = cmd_line
             self.jobs_steps[pseudo_file_name] = gwjob.label
-            self.number_of_retries[self.define_task_name(gwjob.label)] = gwjob.number_of_retries
+            if gwjob.number_of_retries:
+                self.number_of_retries[self.define_task_name(gwjob.label)] = gwjob.number_of_retries
             dependency_map[pseudo_file_name] = []
             predecessors = self.bps_workflow.predecessors(job_name)
             for parent_name in predecessors:
