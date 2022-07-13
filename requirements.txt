@@ -1,4 +1,3 @@
-astropy
 click
 idds-client
 idds-common
