@@ -1,0 +1,15 @@
+# An example bps submission yaml
+# Need to setup USDF before submitting the yaml
+# source setupUSDF.sh
+
+LSST_VERSION: w_2022_30
+
+includeConfigs:
+- ${CTRL_BPS_PANDA_DIR}/config/bps_usdf.yaml
+
+pipelineYaml: "${DRP_PIPE_DIR}/pipelines/HSC/DRP-RC2.yaml#isr"
+
+payload:
+  payloadName: testUSDF
+  inCollection: "HSC/RC2/defaults"
+  dataQuery: "exposure = 34342 AND detector = 10"
