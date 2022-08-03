@@ -1,0 +1,30 @@
+includeConfigs:
+- ${CTRL_BPS_PANDA_DIR}/config/bps_panda.yaml
+
+
+project: dev
+campaign: quick
+computeCloud: LSST
+computeSite: LSST
+pipelineYaml: "${OBS_LSST_DIR}/pipelines/imsim/DRP.yaml#step1"
+
+
+# lsst Docker image location in GAR (Google Artifact Registry)
+# Must end with slash. Override with empty string to use images from the Docker hub instead.
+dockerImageLocation: "us-central1-docker.pkg.dev/panda-dev-1a74/"
+
+
+payload:
+  s3EndpointUrl: "https://storage.googleapis.com"
+  butlerConfig: s3://butler-us-central1-panda-dev/dc2/butler-external.yaml
+  payloadFolder: payload
+  fileDistributionEndPoint: "s3://butler-us-central1-panda-dev/dc2/{payloadFolder}/{uniqProcName}/"
+
+
+# IDF is configured with many PanDA queues
+executionButler:
+  queue: "DOMA_LSST_GOOGLE_MERGE"
+
+pipetask:
+  forcedPhotCoadd:
+    queue: "DOMA_LSST_GOOGLE_TEST_HIMEM_NON_PREEMPT"
