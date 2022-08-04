@@ -1,0 +1,1 @@
+Fix the bug the bps-panda reports successful when there is an authentication permission error.
