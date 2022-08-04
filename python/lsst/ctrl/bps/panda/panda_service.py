@@ -335,7 +335,7 @@ class PanDAService(BaseWmsService):
                 status = True
                 result = ret[1][1]
                 error = None
-                if 'Authentication no permission' in result:
+                if "Authentication no permission" in result:
                     status = False
                     error = result
                     result = None
