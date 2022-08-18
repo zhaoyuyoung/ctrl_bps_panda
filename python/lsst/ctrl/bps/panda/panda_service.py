@@ -337,8 +337,8 @@ class PanDAService(BaseWmsService):
                 error = None
                 if "Authentication no permission" in result:
                     status = False
-                    error = result
                     result = None
+                    error = result
             else:
                 # iDDS returns errors
                 status = False
