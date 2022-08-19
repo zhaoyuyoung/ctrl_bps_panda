@@ -16,12 +16,15 @@ runnerCommand: >
   source /cvmfs/sw.lsst.eu/linux-x86_64/lsst_distrib/{LSST_VERSION}/loadLSST.bash;
   pwd; ls -al;
   setup lsst_distrib;
-  prmon -i 5 -f ${PWD}/prmon.txt -j ${PWD}/prmon.json --
-  python3 ${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_;
+  python3 ${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_ & pJob=$!;
+  prmon -i 5
+  -f memory_monitor_output.txt
+  -j memory_monitor_summary.json
+  -p $pJob & mJob=$!;
+  wait $pJob;
   retStat=$?;
+  wait $mJob;
   rm -fr EXEC_REPO-*;
-  ln -fs ${PWD}/prmon.txt ./memory_monitor_output.txt;
-  ln -fs ${PWD}/prmon.json ./memory_monitor_summary.json;
   exit $retStat
 
 payload:
