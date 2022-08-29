@@ -8,15 +8,15 @@ lsst.ctrl.bps.panda
 
 .. Paragraph that describes what this Python module does and links to related modules and frameworks.
 
-.. .. _lsst.ctrl.bps.panda-changes:
+.. _lsst.ctrl.bps.panda-changes:
 
-.. Changes
-.. =======
+Changes
+=======
 
-.. .. toctree::
-..   :maxdepth: 1
+.. toctree::
+  :maxdepth: 1
 
-..   CHANGES.rst
+  CHANGES.rst
 
 .. _lsst.ctrl.bps.panda-using:
 

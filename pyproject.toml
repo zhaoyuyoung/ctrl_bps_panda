@@ -62,9 +62,9 @@ version = { attr = "lsst_versions.get_lsst_version" }
 [tool.towncrier]
     package = "lsst.ctrl.bps.panda"
     package_dir = "python"
-    filename = "doc/lsst.ctrl.bps/CHANGES.rst"
+    filename = "doc/lsst.ctrl.bps.panda/CHANGES.rst"
     directory = "doc/changes"
-    title_format = "ctrl_bps {version} {project_date}"
+    title_format = "lsst-ctrl-bps-panda {version} ({project_date})"
     issue_format = "`{issue} <https://jira.lsstcorp.org/browse/{issue}>`_"
 
     [[tool.towncrier.type]]
