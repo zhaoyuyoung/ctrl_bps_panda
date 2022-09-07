@@ -42,6 +42,8 @@ runnerCommand: >
   logFile=${logDir}/${REALTIME_LOGFILES};
   touch ${logFile};
   chmod ugo+w ${logFile} ${logDir}; ln -s ${logFile} ./;
+  file=${logDir}/memory_monitor_output.txt; touch ${file}; chmod ugo+w ${file}; ln -s ${file} ./;
+  file=${logDir}/memory_monitor_summary.json; touch ${file}; chmod ugo+w ${file}; ln -s ${file} ./;
   docker run
   --rm
   -v ${logDir}:${logDir}
@@ -57,15 +59,16 @@ runnerCommand: >
   ls -al;
   setup lsst_distrib;
   pwd;
-  prmon
-  -i 5
-  -f ${logDir}/prmon.txt
-  -j ${logDir}/prmon.json
-  --
-  python3 \${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_;" >&2;
+  python3 \${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_ & pJob=\$!;
+  prmon -i 5
+  -f ${logDir}/memory_monitor_output.txt
+  -j ${logDir}/memory_monitor_summary.json
+  -p \$pJob & mJob=\$!;
+  wait \$pJob;
+  ret=\$?;
+  wait \$mJob;
+  exit \$ret;" >&2;
   retStat=$?;
-  ln -fs ${logDir}/prmon.txt ./memory_monitor_output.txt;
-  ln -fs ${logDir}/prmon.json ./memory_monitor_summary.json;
   exit $retStat
 
 wmsServiceClass: lsst.ctrl.bps.panda.PanDAService
