@@ -36,7 +36,7 @@ payload:
 # Specify memory request for executionButler, pipetaskInit and forcedPhotCoadd, placeholder for now
 executionButler:
   requestMemory: 7000
-# queue: "SLAC_Rubin_Merge"
+  queue: "SLAC_Rubin_Merge"
 
 pipetask:
   pipetaskInit:
