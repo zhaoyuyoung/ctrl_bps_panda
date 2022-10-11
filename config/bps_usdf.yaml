@@ -10,12 +10,15 @@ computeSite: SLAC
 requestMemory: 2048
 # PanDA does the scheduling based on memory request
 
-# To override the IDF runnerCommand. It can be dropped when a universal runnerCommand is available in bps_panda.yaml
-runnerCommand: >
-  unset PYTHONPATH;
+setupLSSTEnv: >
   source /cvmfs/sw.lsst.eu/linux-x86_64/lsst_distrib/{LSST_VERSION}/loadLSST.bash;
   pwd; ls -al;
   setup lsst_distrib;
+
+# To override the IDF runnerCommand. It can be dropped when a universal runnerCommand is available in bps_panda.yaml
+runnerCommand: >
+  unset PYTHONPATH;
+  {setupLSSTEnv}
   python3 ${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_ & pJob=$!;
   prmon -i 5
   -f memory_monitor_output.txt
