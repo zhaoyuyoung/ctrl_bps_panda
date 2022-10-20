@@ -1,6 +1,6 @@
 # An example bps submission yaml
-# Need to setup USDF before submitting the yaml
-# source setupUSDF.sh
+# Need to setup SDF before submitting the yaml
+# source setup_panda.sh w_2022_32 sdf
 
 LSST_VERSION: w_2022_32
 
@@ -11,7 +11,7 @@ queue: "SLAC_Rubin_SDF"
 
 executionButler:
   requestMemory: 4000
-  queue: "SLAC_Rubin_SDF"
+  queue: "SLAC_Rubin_SDF_Big"
 
 pipelineYaml: "${DRP_PIPE_DIR}/pipelines/HSC/DRP-RC2.yaml#isr"
 
