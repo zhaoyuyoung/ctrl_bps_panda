@@ -5,6 +5,11 @@ defaultPreCmdOpts: "--long-log --log-level=VERBOSE --log-file payload-log.json"
 # Limit the number of jobs in a single PanDA task
 maxJobsPerTask: 30000
 
+# Default production label: managed
+prodSourceLabel: managed
+
+# Default job priority
+priority: 500
 
 pipetask:
   pipetaskInit:
