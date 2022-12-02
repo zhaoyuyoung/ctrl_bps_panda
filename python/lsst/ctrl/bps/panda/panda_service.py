@@ -28,6 +28,7 @@ import concurrent.futures
 import json
 import logging
 import os
+import re
 
 import idds.common.utils as idds_utils
 import pandaclient.idds_api
@@ -36,7 +37,7 @@ from idds.workflowv2.workflow import AndCondition
 from idds.workflowv2.workflow import Workflow as IDDS_client_workflow
 from lsst.ctrl.bps.bps_config import BpsConfig
 from lsst.ctrl.bps.panda.idds_tasks import IDDSWorkflowGenerator
-from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow
+from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow, WmsRunReport, WmsStates
 from lsst.resources import ResourcePath
 
 _LOG = logging.getLogger(__name__)
@@ -405,7 +406,112 @@ class PanDAService(BaseWmsService):
             Extra message for report command to print.  This could be
             pointers to documentation or to WMS specific commands.
         """
-        raise NotImplementedError
+        message = ""
+        run_reports = []
+
+        idds_client = self.get_idds_client()
+        ret = idds_client.get_requests(request_id=wms_workflow_id, with_detail=True)
+        _LOG.debug("PanDA get workflow status returned = %s", str(ret))
+
+        request_status = ret[0]
+        tasks = ret[1][1]
+        if request_status == 0 and tasks:
+            head = tasks[0]
+            wms_report = WmsRunReport(
+                wms_id=str(head["request_id"]),
+                operator=head["username"],
+                project="",
+                campaign="",
+                payload="",
+                run=head["name"],
+                state=WmsStates.UNKNOWN,
+                total_number_jobs=0,
+                job_state_counts={state: 0 for state in WmsStates},
+                job_summary={},
+                run_summary="",
+            )
+
+            # The status of a task is taken from the first item of state_map.
+            # The workflow is in status WmsStates.FAILED when:
+            #      All tasks have failed.
+            # SubFinished tasks has jobs in
+            #      output_processed_files: Finished
+            #      output_failed_files: Failed
+            #      output_missing_files: Missing
+            state_map = {
+                "Finished": [WmsStates.SUCCEEDED],
+                "SubFinished": [
+                    WmsStates.SUCCEEDED,
+                    WmsStates.FAILED,
+                    WmsStates.PRUNED,
+                ],
+                "Transforming": [
+                    WmsStates.RUNNING,
+                    WmsStates.SUCCEEDED,
+                    WmsStates.FAILED,
+                    WmsStates.UNREADY,
+                    WmsStates.PRUNED,
+                ],
+                "Failed": [WmsStates.FAILED, WmsStates.PRUNED],
+            }
+
+            file_map = {
+                WmsStates.SUCCEEDED: "output_processed_files",
+                WmsStates.RUNNING: "output_processing_files",
+                WmsStates.FAILED: "output_failed_files",
+                WmsStates.UNREADY: "input_new_files",
+                WmsStates.PRUNED: "output_missing_files",
+            }
+
+            # workflow status to report as SUCCEEDED
+            wf_status = ["Finished", "SubFinished", "Transforming"]
+
+            wf_succeed = False
+
+            tasks.sort(key=lambda x: x["transform_workload_id"])
+
+            # Loop over all tasks data returned by idds_client
+            for task in tasks:
+                totaljobs = task["output_total_files"]
+                wms_report.total_number_jobs += totaljobs
+                tasklabel = task["transform_name"]
+                tasklabel = re.sub(wms_report.run + "_", "", tasklabel)
+                status = task["transform_status"]["attributes"]["_name_"]
+                taskstatus = {}
+                # Fill number of jobs in all WmsStates
+                for state in WmsStates:
+                    njobs = 0
+                    # Each WmsState have many iDDS status mapped to it.
+                    for mappedstate in state_map[status]:
+                        if state in file_map and mappedstate == state:
+                            if task[file_map[mappedstate]] is not None:
+                                njobs = task[file_map[mappedstate]]
+                            if state == WmsStates.RUNNING:
+                                njobs += task["output_new_files"] - task["input_new_files"]
+                            break
+                    wms_report.job_state_counts[state] += njobs
+                    taskstatus[state] = njobs
+                wms_report.job_summary[tasklabel] = taskstatus
+
+                # To fill the EXPECTED column
+                if wms_report.run_summary:
+                    wms_report.run_summary += ";"
+                wms_report.run_summary += "%s:%s" % (tasklabel, str(totaljobs))
+
+                if status in wf_status:
+                    wf_succeed = True
+                    wms_report.state = state_map[status][0]
+
+            # All tasks have failed, set the workflow FAILED
+            if not wf_succeed:
+                wms_report.state = WmsStates.FAILED
+
+            run_reports.append(wms_report)
+
+        if request_status != 0 or not tasks:
+            raise RuntimeError(f"Error to get workflow status: {ret} for id: {wms_workflow_id}")
+
+        return run_reports, message
 
     def list_submitted_jobs(self, wms_id=None, user=None, require_bps=True, pass_thru=None, is_global=False):
         """Query WMS for list of submitted WMS workflows/jobs.
