@@ -11,6 +11,9 @@ prodSourceLabel: managed
 # Default job priority
 priority: 500
 
+# Default number of retries
+numberOfRetries: 3
+
 pipetask:
   pipetaskInit:
     # This is different from the ctrl_bps default only in the addition of {fileDistributionEndPoint}

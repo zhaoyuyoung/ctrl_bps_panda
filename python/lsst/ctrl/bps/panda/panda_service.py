@@ -415,7 +415,9 @@ class PanDAService(BaseWmsService):
 
         request_status = ret[0]
         tasks = ret[1][1]
-        if request_status == 0 and tasks:
+        if request_status != 0 or not tasks:
+            raise RuntimeError(f"Error to get workflow status: {ret} for id: {wms_workflow_id}")
+        else:
             head = tasks[0]
             wms_report = WmsRunReport(
                 wms_id=str(head["request_id"]),
@@ -507,9 +509,6 @@ class PanDAService(BaseWmsService):
                 wms_report.state = WmsStates.FAILED
 
             run_reports.append(wms_report)
-
-        if request_status != 0 or not tasks:
-            raise RuntimeError(f"Error to get workflow status: {ret} for id: {wms_workflow_id}")
 
         return run_reports, message
 
