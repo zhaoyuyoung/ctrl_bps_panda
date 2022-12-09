@@ -188,7 +188,7 @@ class IDDSWorkflowGenerator:
             if bps_node.number_of_retries:
                 task.max_attempt = bps_node.number_of_retries
             else:
-                task.max_attempt = self.number_of_retries.get(task_name, 5)
+                task.max_attempt = self.number_of_retries.get(task_name, 3)
             if bps_node.request_walltime:
                 task.max_walltime = bps_node.request_walltime
             else:
@@ -319,7 +319,7 @@ class IDDSWorkflowGenerator:
             if final_job.number_of_retries:
                 task.max_attempt = final_job.number_of_retries
             else:
-                task.max_attempt = self.number_of_retries.get(task.name, 5)
+                task.max_attempt = self.number_of_retries.get(task.name, 3)
             if final_job.request_walltime:
                 task.max_walltime = final_job.request_walltime
             else:
