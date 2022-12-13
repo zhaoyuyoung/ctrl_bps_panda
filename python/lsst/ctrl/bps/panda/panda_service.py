@@ -409,14 +409,21 @@ class PanDAService(BaseWmsService):
         message = ""
         run_reports = []
 
+        if not wms_workflow_id:
+            message = "Run summary not implemented yet, use 'bps report --id <workflow_id>' instead"
+            return run_reports, message
+
         idds_client = self.get_idds_client()
         ret = idds_client.get_requests(request_id=wms_workflow_id, with_detail=True)
         _LOG.debug("PanDA get workflow status returned = %s", str(ret))
 
         request_status = ret[0]
-        tasks = ret[1][1]
-        if request_status != 0 or not tasks:
+        if request_status != 0:
             raise RuntimeError(f"Error to get workflow status: {ret} for id: {wms_workflow_id}")
+
+        tasks = ret[1][1]
+        if not tasks:
+            message = f"No records found for workflow id '{wms_workflow_id}'. Hint: double check the id"
         else:
             head = tasks[0]
             wms_report = WmsRunReport(
