@@ -18,11 +18,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+import logging
 import os.path
 from dataclasses import dataclass
 
 from lsst.ctrl.bps import GenericWorkflow, GenericWorkflowJob
 from lsst.ctrl.bps.panda.cmd_line_embedder import CommandLineEmbedder
+
+_LOG = logging.getLogger(__name__)
 
 
 @dataclass
@@ -387,6 +390,7 @@ class IDDSWorkflowGenerator:
                 gwjob.executable.src_uri + " " + gwjob.arguments, gwjob.cmdvals, job_name
             )
             if len(pseudo_file_name) > 4000:
+                _LOG.error(f"pseudo_file_name: {pseudo_file_name}")
                 raise NameError(
                     "job pseudo input file name contains more than 4000 symbols. Can not proceed."
                 )
