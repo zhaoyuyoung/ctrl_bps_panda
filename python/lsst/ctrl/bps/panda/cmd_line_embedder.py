@@ -21,6 +21,7 @@
 
 import logging
 import os
+import re
 
 _LOG = logging.getLogger(__name__)
 
@@ -119,8 +120,12 @@ class CommandLineEmbedder:
         file_name: `str`
             job pseudo input file name
         """
+        cmd_vals = set([m.group(1) for m in re.finditer(r"[^$]{([^}]+)}", cmd_line)])
+        actual_lazy_vars = {}
+        for key in cmd_vals:
+            actual_lazy_vars[key] = lazy_vars[key]
 
-        cmd_line = self.replace_static_parameters(cmd_line, lazy_vars)
+        cmd_line = self.replace_static_parameters(cmd_line, actual_lazy_vars)
         cmd_line = self.resolve_submission_side_env_vars(cmd_line)
-        file_name = job_name + self.attach_pseudo_file_params(lazy_vars)
+        file_name = job_name + self.attach_pseudo_file_params(actual_lazy_vars)
         return cmd_line, file_name
