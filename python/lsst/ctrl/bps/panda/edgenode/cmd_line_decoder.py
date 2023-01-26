@@ -111,6 +111,8 @@ def deliver_input_files(src_path, files, skip_copy):
                 dest = dest_base.join(file_to_copy.basename())
                 dest.transfer_from(file_to_copy, transfer="copy")
                 print(f"copied {file_to_copy.path} " f"to {dest.path}", file=sys.stderr)
+            if file_name_placeholder == "job_executable":
+                os.chmod(dest.path, 0o777)
 
 
 deliver_input_files(sys.argv[3], sys.argv[4], sys.argv[5])

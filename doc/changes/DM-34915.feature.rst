@@ -1,0 +1,1 @@
+Enable saving of iDDS client workflow objects at prepare bps submission stage.
