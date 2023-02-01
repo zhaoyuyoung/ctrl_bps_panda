@@ -30,7 +30,6 @@ from lsst.daf.butler.cli.opt import (
 
 
 class PandaAuthCli(LoaderCLI):
-
     localCmdPkg = "lsst.ctrl.bps.panda.cli.cmd"
 
 
