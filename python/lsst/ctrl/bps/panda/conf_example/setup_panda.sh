@@ -14,4 +14,3 @@ fi
 echo "setup from:" $setupScript
 
 source $setupScript $1
-
