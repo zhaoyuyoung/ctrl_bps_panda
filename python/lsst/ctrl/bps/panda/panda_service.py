@@ -52,7 +52,7 @@ class PanDAService(BaseWmsService):
         # Docstring inherited from BaseWmsService.prepare.
         _LOG.debug("out_prefix = '%s'", out_prefix)
         workflow = PandaBpsWmsWorkflow.from_generic_workflow(
-            config, generic_workflow, out_prefix, f"{self.__class__.__module__}." f"{self.__class__.__name__}"
+            config, generic_workflow, out_prefix, f"{self.__class__.__module__}.{self.__class__.__name__}"
         )
         workflow.write(out_prefix)
         return workflow
