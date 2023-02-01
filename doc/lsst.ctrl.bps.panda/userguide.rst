@@ -112,4 +112,3 @@ Restarting a failed run
 .. _bps restart: https://pipelines.lsst.io/v/weekly/modules/lsst.ctrl.bps/quickstart.html#restarting-a-failed-run
 .. _bps submit: https://pipelines.lsst.io/v/weekly/modules/lsst.ctrl.bps/quickstart.html#submitting-a-run
 .. _ctrl_bps: https://github.com/lsst/ctrl_bps.git
-

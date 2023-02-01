@@ -1,7 +1,7 @@
 #!/bin/bash
 # setup Rubin env
 export LSST_VERSION=w_2022_32
-source /cvmfs/sw.lsst.eu/linux-x86_64/lsst_distrib/${LSST_VERSION}/loadLSST.bash 
+source /cvmfs/sw.lsst.eu/linux-x86_64/lsst_distrib/${LSST_VERSION}/loadLSST.bash
 setup lsst_distrib
 
 # setup PanDA env. Will be a simple step when the deployment of PanDA is fully done.

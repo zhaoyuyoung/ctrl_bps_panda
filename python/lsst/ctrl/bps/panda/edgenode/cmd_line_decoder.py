@@ -21,10 +21,10 @@ def replace_placeholders(cmd_line, tag, replancements):
             cmd_line = cmd_line.replace(f"<{tag}:{placeholder}>", replancements[placeholder])
         else:
             raise ValueError(
-                f"ValueError exception thrown, because "
+                "ValueError exception thrown, because "
                 f"{placeholder} is not found in the "
-                f"replacement values and could "
-                f"not be passed to the command line"
+                "replacement values and could "
+                "not be passed to the command line"
             )
     return cmd_line
 
@@ -110,7 +110,7 @@ def deliver_input_files(src_path, files, skip_copy):
             for file_to_copy in files_to_copy:
                 dest = dest_base.join(file_to_copy.basename())
                 dest.transfer_from(file_to_copy, transfer="copy")
-                print(f"copied {file_to_copy.path} " f"to {dest.path}", file=sys.stderr)
+                print(f"copied {file_to_copy.path} to {dest.path}", file=sys.stderr)
             if file_name_placeholder == "job_executable":
                 os.chmod(dest.path, 0o777)
 
