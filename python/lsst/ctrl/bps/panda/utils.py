@@ -81,7 +81,7 @@ def copy_files_for_distribution(files_to_stage, file_distribution_uri, max_copy_
 
     # In case there are folders we iterate over its content
     for local_pfn in files_to_stage.values():
-        folder_name = os.path.basename(local_pfn)
+        folder_name = os.path.basename(os.path.normpath(local_pfn))
         if os.path.isdir(local_pfn):
             files_in_folder = ResourcePath.findFileResources([local_pfn])
             for file in files_in_folder:
@@ -415,9 +415,14 @@ def add_decoder_prefix(config, cmd_line, distribution_path, files):
     # Manipulate file paths for placement on cmdline
     files_plc_hldr = {}
     for key, pfn in files[0].items():
-        files_plc_hldr[key] = os.path.basename(pfn)
-        _, extension = os.path.splitext(pfn)
-        if os.path.isdir(pfn) or (key == "butlerConfig" and not extension):
+        if pfn.endswith("/"):
+            files_plc_hldr[key] = os.path.basename(pfn[:-1])
+            isdir = True
+        else:
+            files_plc_hldr[key] = os.path.basename(pfn)
+            _, extension = os.path.splitext(pfn)
+            isdir = os.path.isdir(pfn) or (key == "butlerConfig" and extension != "yaml")
+        if isdir:
             # this is needed to make isdir function working
             # properly in ButlerURL instance on the egde node
             files_plc_hldr[key] += "/"
