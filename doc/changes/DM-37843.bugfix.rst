@@ -1,0 +1,1 @@
+Fix the execution butler transfer bug when period in run collection.
