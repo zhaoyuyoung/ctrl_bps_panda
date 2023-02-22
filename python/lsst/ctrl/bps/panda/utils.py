@@ -483,9 +483,24 @@ def add_idds_work(config, generic_workflow, idds_workflow):
         job_count = 0  # Number of jobs in idds task used for task chunking
         task_chunk = 1  # Task chunk number within job label used for unique name
         work = None
-        for gwjob in generic_workflow.get_jobs_by_label(job_label):
+
+        # Instead of changing code to make chunks up front and round-robin
+        # assign jobs to chunks, for now keeping chunk creation in loop
+        # but using knowledge of how many chunks there will be to set better
+        # maximum number of jobs in a chunk for more even distribution.
+        jobs_by_label = generic_workflow.get_jobs_by_label(job_label)
+        num_chunks = -(-len(jobs_by_label) // max_jobs_per_task)  # ceil
+        max_jobs_per_task_this_label = -(-len(jobs_by_label) // num_chunks)
+        _LOG.debug(
+            "For job_label = %s, num jobs = %s, num_chunks = %s, max_jobs = %s",
+            job_label,
+            len(jobs_by_label),
+            num_chunks,
+            max_jobs_per_task_this_label,
+        )
+        for gwjob in jobs_by_label:
             job_count += 1
-            if job_count >= max_jobs_per_task:
+            if job_count > max_jobs_per_task_this_label:
                 job_count = 1
                 task_chunk += 1
 
