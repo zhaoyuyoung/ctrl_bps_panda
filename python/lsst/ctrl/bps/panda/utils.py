@@ -494,6 +494,7 @@ def add_idds_work(config, generic_workflow, idds_workflow):
                 task_count += 1
                 work, files = _make_doma_work(config, generic_workflow, gwjob, task_count, task_chunk)
                 files_to_pre_stage.update(files)
+                idds_workflow.add_work(work)
                 if generic_workflow.out_degree(gwjob.name) == 0:
                     dag_sink_work.append(work)
 
@@ -512,5 +513,4 @@ def add_idds_work(config, generic_workflow, idds_workflow):
                     }
                 )
             work.dependency_map.append({"name": pseudo_filename, "dependencies": deps})
-        idds_workflow.add_work(work)
     return files_to_pre_stage, dag_sink_work, task_count
