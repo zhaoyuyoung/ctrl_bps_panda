@@ -1,1 +1,0 @@
-Fix the setting of ``number_of_retries`` to `None` in ``idds_tasks``.

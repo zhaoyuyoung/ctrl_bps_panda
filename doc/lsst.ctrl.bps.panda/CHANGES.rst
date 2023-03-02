@@ -1,3 +1,29 @@
+lsst-ctrl-bps-panda v25.0.0 (2023-03-02)
+========================================
+
+New Features
+------------
+
+- Added cancel, restart, report and ping functions in bps panda plugin. (`DM-34964 <https://jira.lsstcorp.org/browse/DM-34964>`_)
+- Added ``setupLSSTEnv`` in ``bps_usdf.yaml`` which can be updated to setup developer lsst pipelines stack. (`DM-36376 <https://jira.lsstcorp.org/browse/DM-36376>`_)
+
+
+Bug Fixes
+---------
+
+- Fixed the bug that bps-panda reports success when there is an authentication permission error. (`DM-35364 <https://jira.lsstcorp.org/browse/DM-35364>`_)
+- Fixed the setting of ``number_of_retries`` to `None` in ``idds_tasks``. (`DM-35508 <https://jira.lsstcorp.org/browse/DM-35508>`_)
+- Fixed the bug that iDDS results can be something other than a string. (`DM-35964 <https://jira.lsstcorp.org/browse/DM-35964>`_)
+
+
+Other Changes and Additions
+---------------------------
+
+- Added the ability to prioritize dev/test tasks
+  * ``prodSourceLabel``: it can be configured in the submission yaml, by default it is 'managed'
+  * ``priority``: it can be set in the submission yaml, by default it is 500 (`DM-36375 <https://jira.lsstcorp.org/browse/DM-36375>`_)
+
+
 lsst-ctrl-bps-panda v24.0.0 (2022-08-29)
 ========================================
 

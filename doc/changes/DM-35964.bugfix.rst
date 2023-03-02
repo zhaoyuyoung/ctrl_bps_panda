@@ -1,1 +1,0 @@
-Fix the bug that idds results can be something other than a string.

@@ -1,3 +1,0 @@
-fast handle dev/test tasks
-* ``prodSourceLabel``: it can be configured in the submission yaml, by default it is 'managed'
-* ``priority``: it can be set in the submission yaml, by default it is 500
