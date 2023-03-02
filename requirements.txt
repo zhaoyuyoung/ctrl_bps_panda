@@ -5,7 +5,7 @@ idds-doma
 idds-workflow
 panda-client
 pyyaml
-git+https://github.com/lsst/ctrl_bps@main
+git+https://github.com/lsst/ctrl_bps@main#egg=lsst-ctrl-bps
 git+https://github.com/lsst/daf_butler@main#egg=lsst-daf-butler
 git+https://github.com/lsst/resources@main#egg=lsst-resources
 git+https://github.com/lsst/utils@main#egg=lsst-utils

@@ -1,1 +1,0 @@
-Add setupLSSTEnv in bps_usdf.yaml which can be updated to setup developer lsst stack.
