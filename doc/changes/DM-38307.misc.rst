@@ -1,0 +1,3 @@
+Update some default yaml values to more easily allow parts to be
+modified as well as provide values to go with the updated bps
+default yaml (e.g., no longer need runQuantumCommands).

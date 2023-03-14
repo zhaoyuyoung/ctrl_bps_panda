@@ -429,8 +429,9 @@ def add_decoder_prefix(config, cmd_line, distribution_path, files):
         _LOG.debug("files_plc_hldr[%s] = %s", key, files_plc_hldr[key])
 
     cmdline_hex = convert_exec_string_to_hex(cmd_line)
-    _, decoder_prefix = config.search("runnerCommand", opt={"replaceEnvVars": False, "expandEnvVars": False})
-    decoder_prefix = decoder_prefix.replace(
+    _, runner_command = config.search("runnerCommand", opt={"replaceEnvVars": False, "expandEnvVars": False})
+    runner_command = runner_command.replace("\n", " ")
+    decoder_prefix = runner_command.replace(
         "_cmd_line_",
         str(cmdline_hex)
         + " ${IN/L} "
