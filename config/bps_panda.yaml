@@ -1,6 +1,6 @@
 # PANDA plugin specific settings:
 placeholderParams: ['qgraphNodeId', 'qgraphId']
-defaultPreCmdOpts: "--long-log --log-level=VERBOSE --log-file payload-log.json"
+defaultPreCmdOpts: "--long-log --log-level=VERBOSE --log-file payload-log.json --log-label REPO={butlerConfig}"
 
 # Limit the number of jobs in a single PanDA task
 maxJobsPerTask: 30000
