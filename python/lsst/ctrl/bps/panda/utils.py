@@ -464,6 +464,11 @@ def add_idds_work(config, generic_workflow, idds_workflow):
         The work nodes in the client workflow which have no successors.
     task_count : `int`
         Number of tasks in iDDS workflow used for unique task names
+
+    Raises
+    ------
+    RuntimeError
+        If cannot recover from dependency issues after pass through workflow.
     """
     # Limit number of jobs in single PanDA task
     _, max_jobs_per_task = config.search("maxJobsPerTask", opt={"default": PANDA_DEFAULT_MAX_JOBS_PER_TASK})
@@ -473,6 +478,10 @@ def add_idds_work(config, generic_workflow, idds_workflow):
     job_to_task = {}
     job_to_pseudo_filename = {}
     task_count = 0  # Task number/ID in idds workflow used for unique name
+
+    # To avoid dying due to optimizing number of times through workflow,
+    # catch dependency issues to loop through again later.
+    jobs_with_dependency_issues = {}
 
     # Assume jobs with same label share config values
     for job_label in generic_workflow.labels:
@@ -517,9 +526,37 @@ def add_idds_work(config, generic_workflow, idds_workflow):
             job_to_pseudo_filename[gwjob.name] = pseudo_filename
             job_to_task[gwjob.name] = work.get_work_name()
             deps = []
+            missing_deps = False
             for parent_job_name in generic_workflow.predecessors(gwjob.name):
                 if parent_job_name not in job_to_task:
                     _LOG.debug("job_to_task.keys() = %s", job_to_task.keys())
+                    missing_deps = True
+                    break
+                else:
+                    deps.append(
+                        {
+                            "task": job_to_task[parent_job_name],
+                            "inputname": job_to_pseudo_filename[parent_job_name],
+                            "available": False,
+                        }
+                    )
+            if not missing_deps:
+                work.dependency_map.append({"name": pseudo_filename, "dependencies": deps})
+            else:
+                jobs_with_dependency_issues[gwjob.name] = work
+
+    # If there were any issues figuring out dependencies through earlier loop
+    if jobs_with_dependency_issues:
+        _LOG.warning("Could not prepare workflow in single pass.  Please notify developers.")
+        _LOG.info("Trying to recover...")
+        for job_name, work in jobs_with_dependency_issues.items():
+            deps = []
+            for parent_job_name in generic_workflow.predecessors(job_name):
+                if parent_job_name not in job_to_task:
+                    _LOG.debug("job_to_task.keys() = %s", job_to_task.keys())
+                    raise RuntimeError(
+                        "Could not recover from dependency issues ({job_name} missing {parent_job_name})."
+                    )
                 deps.append(
                     {
                         "task": job_to_task[parent_job_name],
@@ -527,5 +564,8 @@ def add_idds_work(config, generic_workflow, idds_workflow):
                         "available": False,
                     }
                 )
+            pseudo_filename = job_to_pseudo_filename[job_name]
             work.dependency_map.append({"name": pseudo_filename, "dependencies": deps})
+        _LOG.info("Successfully recovered.")
+
     return files_to_pre_stage, dag_sink_work, task_count
