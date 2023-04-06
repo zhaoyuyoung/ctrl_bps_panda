@@ -1,72 +1,35 @@
-# PANDA plugin specific settings:
-# iddsServer: "https://aipanda015.cern.ch:443/idds"
-placeholderParams: ['qgraphNodeId', 'qgraphId']
-defaultPreCmdOpts: "--long-log --log-level=VERBOSE --log-file payload-log.json"
+includeConfigs:
+- ${CTRL_BPS_PANDA_DIR}/config/bps_panda.yaml
+
+
+project: dev
+campaign: quick
+computeCloud: LSST
+computeSite: LSST
+pipelineYaml: "${OBS_LSST_DIR}/pipelines/imsim/DRP.yaml#step1"
+
+payload:
+  butlerConfig: s3://butler-us-central1-panda-dev/dc2/butler-external.yaml
+
+# Job environment setup
+custom_lsst_setup: ""
+setupLSSTEnv: >
+  source /opt/lsst/software/stack/loadLSST.bash;
+  setup lsst_distrib;
+  {custom_lsst_setup}
 
 # lsst Docker image location in GAR (Google Artifact Registry)
 # Must end with slash. Override with empty string to use images from the Docker hub instead.
 dockerImageLocation: "us-central1-docker.pkg.dev/panda-dev-1a74/"
-
-# Limit the number of jobs in a single PanDA task
-maxJobsPerTask: 30000
-
-# IDF PanDA specific settings:
-# One cloud can have multiple sites. One site can have multiple queues.
-# For LSST cloud, there is one one site LSST.
-# If there are multiple sites in a cloud, computeSite can be used.
-computeCloud: "LSST"
-computeSite: "LSST"
-
-payload:
-  s3EndpointUrl: "https://storage.googleapis.com"
-  payloadFolder: payload
-  fileDistributionEndPoint: "s3://butler-us-central1-panda-dev/dc2/{payloadFolder}/{uniqProcName}/"
-
-# SLAC PanDA specific settings:
-# computingCloud: US
-# computeSite: DOMA_LSST_SLAC_TEST
-
-executionButler:
-  queue: "DOMA_LSST_GOOGLE_MERGE"
-
-pipetask:
-  pipetaskInit:
-    # This is different from the ctrl_bps default only in the addition of {fileDistributionEndPoint}
-    runQuantumCommand: >
-      ${CTRL_MPEXEC_DIR}/bin/pipetask {initPreCmdOpts} run
-      -b {butlerConfig}
-      -i {inCollection}
-      -o {output}
-      --output-run {outputRun}
-      --qgraph {fileDistributionEndPoint}/{qgraphFile}
-      --qgraph-id {qgraphId} --qgraph-node-id {qgraphNodeId}
-      --clobber-outputs
-      --init-only
-      --extend-run {extraInitOptions}
-  forcedPhotCoadd:
-    queue: "DOMA_LSST_GOOGLE_TEST_HIMEM_NON_PREEMPT"
-
-# This is different from the ctrl_bps default only in the addition of {fileDistributionEndPoint}
-runQuantumCommand: >
-  ${CTRL_MPEXEC_DIR}/bin/pipetask {runPreCmdOpts} run
-  -b {butlerConfig}
-  -i {inCollection}
-  -o {output}
-  --output-run {outputRun}
-  --qgraph {fileDistributionEndPoint}/{qgraphFile}
-  --qgraph-id {qgraphId}
-  --qgraph-node-id {qgraphNodeId}
-  --clobber-outputs
-  --skip-init-writes
-  --extend-run {extraRunQuantumOptions}
-
-# This is a series of setup commands preceding the actual core SW execution with running prmon (memory monitor)
-runnerCommand: >
-  logDir=/tmp/panda/${PANDAID};
-  mkdir ${logDir};
+payloadFolder: payload
+fileDistributionEndPoint: "s3://butler-us-central1-panda-dev/dc2/{payloadFolder}/{uniqProcName}/"
+s3EndpointUrl: "https://storage.googleapis.com"
+jobLogDir: "/tmp/panda/${PANDAID}"
+jobInitDir: "/tmp"
+jobContainer: >
   logFile=${logDir}/${REALTIME_LOGFILES};
   touch ${logFile};
-  chmod ugo+w ${logFile} ${logDir}; ln -s ${logFile} ./;
+  chmod ugo+w ${logFile}; ln -s ${logFile} ./;
   docker run
   --rm
   -v ${logDir}:${logDir}
@@ -77,19 +40,16 @@ runnerCommand: >
   --env AWS_SECRET_ACCESS_KEY=$(</credentials/AWS_SECRET_ACCESS_KEY)
   --env PGPASSWORD=$(</credentials/PGPASSWORD)
   --env S3_ENDPOINT_URL=${S3_ENDPOINT_URL} {sw_image}
-  /bin/bash -c "source /opt/lsst/software/stack/loadLSST.bash;
-  cd /tmp;
-  ls -al;
-  setup lsst_distrib;
-  pwd;
-  prmon
-  -i 5
-  -f ${logDir}/prmon.txt
-  -j ${logDir}/prmon.json
-  --
-  python3 \${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_;" >&2;
-  retStat=$?;
-  ln -fs ${logDir}/prmon.txt ./memory_monitor_output.txt;
-  ln -fs ${logDir}/prmon.json ./memory_monitor_summary.json;
-  exit $retStat
-wmsServiceClass: lsst.ctrl.bps.panda.PanDAService
+  /bin/bash -c "{payloadCommand}" >&2;
+
+jobCleanup: ""
+
+# IDF is configured with many PanDA queues
+# non-preemption is currently not a feature currently
+# matched when selecting destination queue automatically.
+executionButler:
+  queue: "DOMA_LSST_GOOGLE_MERGE"
+
+pipetask:
+  forcedPhotCoadd:
+    queue: "DOMA_LSST_GOOGLE_TEST_HIMEM_NON_PREEMPT"

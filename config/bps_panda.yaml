@@ -1,6 +1,8 @@
 # PANDA plugin specific settings:
+wmsServiceClass: lsst.ctrl.bps.panda.PanDAService
 placeholderParams: ['qgraphNodeId', 'qgraphId']
 defaultPreCmdOpts: "--long-log --log-level=VERBOSE --log-file payload-log.json --log-label REPO={butlerConfig}"
+qgraphPreCmdOpts: "--long-log --log-level=VERBOSE"  # don't need payload-log.json on submit side.
 
 # Limit the number of jobs in a single PanDA task
 maxJobsPerTask: 30000
@@ -14,58 +16,18 @@ priority: 500
 # Default number of retries
 numberOfRetries: 3
 
-pipetask:
-  pipetaskInit:
-    # This is different from the ctrl_bps default only in the addition of {fileDistributionEndPoint}
-    runQuantumCommand: >
-      ${CTRL_MPEXEC_DIR}/bin/pipetask {initPreCmdOpts} run
-      -b {butlerConfig}
-      -i {inCollection}
-      -o {output}
-      --output-run {outputRun}
-      --qgraph {fileDistributionEndPoint}/{qgraphFile}
-      --qgraph-id {qgraphId} --qgraph-node-id {qgraphNodeId}
-      --clobber-outputs
-      --init-only
-      --extend-run {extraInitOptions}
+# Job values which sites need to define for runnerCommand:
+# custom_lsst_setup - user defined special environments
+# setupLSSTEnv - how to get lsst_distrib set up
+# jobLogDir - where prmon and other non-payload logs go
+# jobInitDir - directory were should be when job starts
+# jobContainer - any commands needed to set up container
+# jobCleanup - any cleanup commands to run after job
 
-# This is different from the ctrl_bps default only in the addition of {fileDistributionEndPoint}
-runQuantumCommand: >
-  ${CTRL_MPEXEC_DIR}/bin/pipetask {runPreCmdOpts} run
-  -b {butlerConfig}
-  -i {inCollection}
-  -o {output}
-  --output-run {outputRun}
-  --qgraph {fileDistributionEndPoint}/{qgraphFile}
-  --qgraph-id {qgraphId}
-  --qgraph-node-id {qgraphNodeId}
-  --clobber-outputs
-  --skip-init-writes
-  --extend-run {extraRunQuantumOptions}
-
-# This is a series of setup commands preceding the actual core SW execution with running prmon (memory monitor)
-runnerCommand: >
-  logDir=/tmp/panda/${PANDAID};
-  mkdir ${logDir};
-  logFile=${logDir}/${REALTIME_LOGFILES};
-  touch ${logFile};
-  chmod ugo+w ${logFile} ${logDir}; ln -s ${logFile} ./;
-  file=${logDir}/memory_monitor_output.txt; touch ${file}; chmod ugo+w ${file}; ln -s ${file} ./;
-  file=${logDir}/memory_monitor_summary.json; touch ${file}; chmod ugo+w ${file}; ln -s ${file} ./;
-  docker run
-  --rm
-  -v ${logDir}:${logDir}
-  -v ${logFile}:/tmp/${REALTIME_LOGFILES}
-  --network host
-  --privileged
-  --env AWS_ACCESS_KEY_ID=$(</credentials/AWS_ACCESS_KEY_ID)
-  --env AWS_SECRET_ACCESS_KEY=$(</credentials/AWS_SECRET_ACCESS_KEY)
-  --env PGPASSWORD=$(</credentials/PGPASSWORD)
-  --env S3_ENDPOINT_URL=${S3_ENDPOINT_URL} {sw_image}
-  /bin/bash -c "source /opt/lsst/software/stack/loadLSST.bash;
-  cd /tmp;
+payloadCommand: >
+  cd {jobInitDir};
   ls -al;
-  setup lsst_distrib;
+  {setupLSSTEnv}
   pwd;
   python3 \${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/cmd_line_decoder.py _cmd_line_ & pJob=\$!;
   prmon -i 5
@@ -75,8 +37,17 @@ runnerCommand: >
   wait \$pJob;
   ret=\$?;
   wait \$mJob;
-  exit \$ret;" >&2;
+  {jobCleanup}
+  exit \$ret;
+
+runnerCommand: >
+  logDir={jobLogDir};
+  mkdir -p ${logDir};
+  chmod ugo+w ${logDir};
+  file=${logDir}/memory_monitor_output.txt; touch ${file}; chmod ugo+w ${file};
+  if [ ! -e memory_monitor_output.txt ]; then ln -s ${file} ./; fi;
+  file=${logDir}/memory_monitor_summary.json; touch ${file}; chmod ugo+w ${file};
+  if [ ! -e memory_monitor_summary.json ]; then ln -s ${file} ./; fi;
+  {jobContainer}
   retStat=$?;
   exit $retStat
-
-wmsServiceClass: lsst.ctrl.bps.panda.PanDAService
