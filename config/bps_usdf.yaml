@@ -9,7 +9,8 @@ computeCloud: US
 computeSite: SLAC
 s3EndpointUrl: "https://storage.googleapis.com"
 payloadFolder: payload
-fileDistributionEndPoint: "file:///sdf/group/rubin/sandbox/{operator}/panda_cache_box/{payloadFolder}/{uniqProcName}/"
+fileDistributionEndPoint: "${LSST_RUN_TEMP_SPACE}/{operator}/panda_cache_box/{payloadFolder}/{uniqProcName}/"
+fileDistributionEndPointDefault: "file:///sdf/data/rubin/panda_jobs/panda_cache/{operator}/panda_cache_box/{payloadFolder}/{uniqProcName}/"
 
 # location of main butler repo at USDF
 payload:
@@ -32,7 +33,7 @@ jobCleanup: "rm -fr EXEC_REPO-*;"
 
 
 # Specify memory request for executionButler, pipetaskInit and forcedPhotCoadd, placeholder for now
-requestMemory: 2048 # PanDA does the scheduling based on memory request
+requestMemory: 2048          # PanDA does the scheduling based on memory request
 executionButler:
   requestMemory: 7000
   queue: "SLAC_Rubin_Merge"
