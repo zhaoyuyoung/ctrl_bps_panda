@@ -1,0 +1,1 @@
+Move fileDistributionEndPoint from lustre to weka

@@ -237,6 +237,10 @@ def _make_doma_work(config, generic_workflow, gwjob, task_count, task_chunk):
         "fileDistributionEndPoint", opt={"curvals": cvals, "default": None}
     )
 
+    _, file_distribution_end_point_default = config.search(
+        "fileDistributionEndPointDefault", opt={"curvals": cvals, "default": None}
+    )
+
     # Assume input files are same across task
     local_pfns = {}
     direct_io_files = set()
@@ -263,6 +267,10 @@ def _make_doma_work(config, generic_workflow, gwjob, task_count, task_chunk):
 
     if not direct_io_files:
         direct_io_files.add("cmdlineplaceholder")
+
+    lsst_temp = "LSST_RUN_TEMP_SPACE"
+    if lsst_temp in file_distribution_end_point and lsst_temp not in os.environ:
+        file_distribution_end_point = file_distribution_end_point_default
 
     executable = add_decoder_prefix(
         config, cmd_line, file_distribution_end_point, (local_pfns, direct_io_files)
