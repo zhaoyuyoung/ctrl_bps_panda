@@ -120,7 +120,7 @@ class CommandLineEmbedder:
         file_name: `str`
             job pseudo input file name
         """
-        cmd_vals = set([m.group(1) for m in re.finditer(r"[^$]{([^}]+)}", cmd_line)])
+        cmd_vals = {m.group(1) for m in re.finditer(r"[^$]{([^}]+)}", cmd_line)}
         actual_lazy_vars = {}
         for key in cmd_vals:
             actual_lazy_vars[key] = lazy_vars[key]
