@@ -77,7 +77,6 @@ class CommandLineEmbedder:
         -------
         processed command line
         """
-
         for param in self.submit_side_resolved:
             if os.getenv(param):
                 cmd_line = cmd_line.replace("<ENV:" + param + ">", os.getenv(param))
@@ -96,7 +95,6 @@ class CommandLineEmbedder:
         -------
         pseudo input file name suffix
         """
-
         file_suffix = ""
         for item in self.leave_placeholder_params:
             file_suffix += "+" + item + ":" + lazy_vars.get(item, "")

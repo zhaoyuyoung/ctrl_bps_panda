@@ -65,7 +65,6 @@ def replace_files_placeholders(cmd_line, files):
     cmd_line: `str`
         Processed command line
     """
-
     files_key_vals = files.split("+")
     files = {}
     for file in files_key_vals:
@@ -91,7 +90,6 @@ def deliver_input_files(src_path, files, skip_copy):
         Processed command line
         :param skip_copy:
     """
-
     files = files.split("+")
     src_uri = ResourcePath(src_path, forceDirectory=True)
     for file in files:
