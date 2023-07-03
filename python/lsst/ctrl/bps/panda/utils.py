@@ -103,7 +103,7 @@ def copy_files_for_distribution(files_to_stage, file_distribution_uri, max_copy_
         future_file_copy.append(copy_executor.submit(trgt.transfer_from, src, transfer="copy"))
 
     for future in concurrent.futures.as_completed(future_file_copy):
-        if not future.result() is None:
+        if future.result() is not None:
             raise RuntimeError("Error of placing files to the distribution point")
 
 
