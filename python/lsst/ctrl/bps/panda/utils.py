@@ -154,7 +154,7 @@ def get_idds_result(ret):
         Error messages.
     """
     # https://panda-wms.readthedocs.io/en/latest/client/rest_idds.html
-    if not isinstance(ret, (list, tuple)) or ret[0] != 0:
+    if not isinstance(ret, list | tuple) or ret[0] != 0:
         # Something wrong with the PanDA relay service.
         # The call may not be delivered to iDDS.
         status = False
