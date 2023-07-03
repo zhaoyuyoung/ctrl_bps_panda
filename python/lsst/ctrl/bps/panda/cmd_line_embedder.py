@@ -82,7 +82,7 @@ class CommandLineEmbedder:
             if os.getenv(param):
                 cmd_line = cmd_line.replace("<ENV:" + param + ">", os.getenv(param))
             else:
-                _LOG.info("Expected parameter {0} is not found in the environment variables".format(param))
+                _LOG.info("Expected parameter %s is not found in the environment variables", param)
         return cmd_line
 
     def attach_pseudo_file_params(self, lazy_vars):
