@@ -27,17 +27,15 @@ _LOG = logging.getLogger(__name__)
 
 
 class CommandLineEmbedder:
-    """
-    Class embeds static (constant across a task) values
+    """Class embeds static (constant across a task) values
     into the pipeline execution command line
     and resolves submission side environment variables
 
     Parameters
     ----------
     config : `lsst.ctrl.bps.BpsConfig`
-            BPS configuration that includes the list of dynamic
-            (uniques per job) and submission side resolved variables
-
+        BPS configuration that includes the list of dynamic
+        (uniques per job) and submission side resolved variables
     """
 
     def __init__(self, config):
@@ -47,18 +45,22 @@ class CommandLineEmbedder:
     def replace_static_parameters(self, cmd_line, lazy_vars):
         """Substitutes the lazy parameters in the command line which
         are static, the same for every job in the workflow and could be
-        defined once. This function offloads the edge node processing
-        and number of parameters transferred together with job
+        defined once.
 
+        This function offloads the edge node processing
+        and number of parameters transferred together with job
 
         Parameters
         ----------
-        cmd_line: `str` command line to be processed
-        lazy_vars: `dict` of lazy variables and its values
+        cmd_line:  `str`
+            Command line to be processed.
+        lazy_vars : `dict`
+            Lazy variables and its values.
 
         Returns
         -------
-        processed command line
+        cmd : `str`
+            Processed command line.
         """
         for param_name, param_val in lazy_vars.items():
             if param_name not in self.leave_placeholder_params:
@@ -66,16 +68,18 @@ class CommandLineEmbedder:
         return cmd_line
 
     def resolve_submission_side_env_vars(self, cmd_line):
-        """Substitutes the lazy parameters in the command line
-        which are defined and resolved on the submission side
+        """Substitute the lazy parameters in the command line
+        which are defined and resolved on the submission side.
 
         Parameters
         ----------
-        cmd_line: `str` command line to be processed
+        cmd_line : `str`
+            Command line to be processed.
 
         Returns
         -------
-        processed command line
+        cmd : `str`
+            Processed command line.
         """
         for param in self.submit_side_resolved:
             if os.getenv(param):
@@ -85,15 +89,17 @@ class CommandLineEmbedder:
         return cmd_line
 
     def attach_pseudo_file_params(self, lazy_vars):
-        """Adds the parameters needed to finalize creation of a pseudo file
+        """Add the parameters needed to finalize creation of a pseudo file.
 
         Parameters
         ----------
-        lazy_vars: `dict` of values of to be substituted
+        lazy_vars : `dict`
+            Values to be substituted.
 
         Returns
         -------
-        pseudo input file name suffix
+        suffix : `str`
+            Pseudo input file name suffix.
         """
         file_suffix = ""
         for item in self.leave_placeholder_params:
@@ -101,15 +107,19 @@ class CommandLineEmbedder:
         return file_suffix
 
     def substitute_command_line(self, cmd_line, lazy_vars, job_name):
-        """Preprocesses the command line leaving for the egde node evaluation
-        only parameters which are job / environment dependent
+        """Preprocess the command line leaving for the egde node evaluation
+        only parameters which are job / environment dependent.
 
         Parameters
         ----------
-        bps_file_name: `str` input file name proposed by BPS
-        cmd_line: `str` command line containing all lazy placeholders
-        lazy_vars: `dict` of lazy parameter name/values
-        job_name: `str` job name proposed by BPS
+        bps_file_name : `str`
+            Input file name proposed by BPS.
+        cmd_line : `str`
+            Command line containing all lazy placeholders.
+        lazy_vars : `dict`
+            Lazy parameter name/values.
+        job_name : `str`
+            Job name proposed by BPS.
 
         Returns
         -------

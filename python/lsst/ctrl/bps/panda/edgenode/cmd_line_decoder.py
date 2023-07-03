@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-This file is needed to decode the command line string sent from the BPS
+Decode the command line string sent from the BPS
 plugin -> PanDA -> Edge node cluster management
 -> Edge node -> Container. This file is not a part
 of the BPS but a part of the payload wrapper.
@@ -15,6 +15,7 @@ from lsst.resources import ResourcePath
 
 
 def replace_placeholders(cmd_line, tag, replancements):
+    """Reaplce the placeholders."""
     occurences_to_replace = re.findall(f"<{tag}:(.*?)>", cmd_line)
     for placeholder in occurences_to_replace:
         if placeholder in replancements:
@@ -30,17 +31,17 @@ def replace_placeholders(cmd_line, tag, replancements):
 
 
 def replace_environment_vars(cmd_line):
-    """Replaces placeholders to the actual environment variables.
+    """Replace placeholders to the actual environment variables.
 
     Parameters
     ----------
     cmd_line : `str`
-        Command line
+        Command line.
 
     Returns
     -------
     cmdline: `str`
-        Processed command line
+        Processed command line.
     """
     environment_vars = os.environ
     cmd_line = replace_placeholders(cmd_line, "ENV", environment_vars)
@@ -48,7 +49,7 @@ def replace_environment_vars(cmd_line):
 
 
 def replace_files_placeholders(cmd_line, files):
-    """Replaces placeholders for files.
+    """Replace placeholders for files.
 
     Parameters
     ----------
@@ -63,7 +64,7 @@ def replace_files_placeholders(cmd_line, files):
     Returns
     -------
     cmd_line: `str`
-        Processed command line
+        Processed command line.
     """
     files_key_vals = files.split("+")
     files = {}
@@ -75,20 +76,22 @@ def replace_files_placeholders(cmd_line, files):
 
 
 def deliver_input_files(src_path, files, skip_copy):
-    """Delivers input files needed for a job
+    """Deliver input files needed for a job.
 
     Parameters
     ----------
     src_path : `str`
-        URI for folder where the input files placed
+        URI for folder where the input files placed.
     files : `str`
-        String with file names separated by the '+' sign
+        String with file names separated by the '+' sign.
+    skip_copy : `str`
+        String with file names separated by the '+' sign indicating which
+        files in ``files`` should not be copied.
 
     Returns
     -------
     cmdline: `str`
-        Processed command line
-        :param skip_copy:
+        Processed command line.
     """
     files = files.split("+")
     src_uri = ResourcePath(src_path, forceDirectory=True)
@@ -118,7 +121,7 @@ cmd_line = str(binascii.unhexlify(sys.argv[1]).decode())
 data_params = sys.argv[2].split("+")
 cmd_line = replace_environment_vars(cmd_line)
 
-"""This call replaces the pipetask command line placeholders
+"""Replace the pipetask command line placeholders
  with actual data provided in the script call
  in form placeholder1:file1+placeholder2:file2:...
 """
