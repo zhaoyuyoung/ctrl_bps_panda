@@ -30,18 +30,22 @@ from lsst.daf.butler.cli.opt import (
 
 
 class PandaAuthCli(LoaderCLI):
+    """Command-line interface loader."""
+
     localCmdPkg = "lsst.ctrl.bps.panda.cli.cmd"
 
 
-@click.command(cls=PandaAuthCli, context_settings=dict(help_option_names=["-h", "--help"]), epilog=None)
+@click.command(cls=PandaAuthCli, context_settings={"help_option_names": ["-h", "--help"]}, epilog=None)
 @log_level_option(default=["INFO"])
 @long_log_option()
 @log_file_option()
 @log_tty_option()
 @log_label_option()
 def cli(log_level, long_log, log_file, log_tty, log_label):
+    """Run click command-line."""
     pass
 
 
 def main():
+    """Run main command-line interface."""
     return cli()

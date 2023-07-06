@@ -32,6 +32,7 @@ import pickle
 import re
 
 from idds.workflowv2.workflow import Workflow as IDDS_client_workflow
+from lsst.ctrl.bps import BaseWmsService, BaseWmsWorkflow, WmsRunReport, WmsStates
 from lsst.ctrl.bps.panda.constants import PANDA_DEFAULT_MAX_COPY_WORKERS
 from lsst.ctrl.bps.panda.utils import (
     add_final_idds_work,
@@ -40,7 +41,6 @@ from lsst.ctrl.bps.panda.utils import (
     get_idds_client,
     get_idds_result,
 )
-from lsst.ctrl.bps.wms_service import BaseWmsService, BaseWmsWorkflow, WmsRunReport, WmsStates
 
 _LOG = logging.getLogger(__name__)
 

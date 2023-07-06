@@ -9,12 +9,16 @@ from lsst.ctrl.bps.panda.panda_auth_utils import panda_auth_status
 
 
 class VersionTestCase(unittest.TestCase):
+    """Test versioning."""
+
     def test_version(self):
         # Check that version is defined.
         self.assertIsNotNone(version)
 
 
 class TestPandaAuthUtils(unittest.TestCase):
+    """Simple test of auth utilities."""
+
     def testPandaAuthStatusWrongEnviron(self):
         unwanted = {
             "PANDA_AUTH",

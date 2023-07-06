@@ -103,7 +103,7 @@ def copy_files_for_distribution(files_to_stage, file_distribution_uri, max_copy_
         future_file_copy.append(copy_executor.submit(trgt.transfer_from, src, transfer="copy"))
 
     for future in concurrent.futures.as_completed(future_file_copy):
-        if not future.result() is None:
+        if future.result() is not None:
             raise RuntimeError("Error of placing files to the distribution point")
 
 
@@ -154,7 +154,7 @@ def get_idds_result(ret):
         Error messages.
     """
     # https://panda-wms.readthedocs.io/en/latest/client/rest_idds.html
-    if not isinstance(ret, (list, tuple)) or ret[0] != 0:
+    if not isinstance(ret, list | tuple) or ret[0] != 0:
         # Something wrong with the PanDA relay service.
         # The call may not be delivered to iDDS.
         status = False
