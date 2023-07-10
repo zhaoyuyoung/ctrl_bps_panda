@@ -97,6 +97,7 @@ def copy_files_for_distribution(files_to_stage, file_distribution_uri, max_copy_
     copy_executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_copy_workers)
     future_file_copy = []
     for src, trgt in files_to_copy.items():
+        _LOG.debug("Staging %s to %s", src, trgt)
         # S3 clients explicitly instantiate here to overpass this
         # https://stackoverflow.com/questions/52820971/is-boto3-client-thread-safe
         trgt.exists()
@@ -194,7 +195,7 @@ def _make_pseudo_filename(config, gwjob):
     """
     cmd_line_embedder = CommandLineEmbedder(config)
     _, pseudo_filename = cmd_line_embedder.substitute_command_line(
-        gwjob.executable.src_uri + " " + gwjob.arguments, gwjob.cmdvals, gwjob.name
+        gwjob.executable.src_uri + " " + gwjob.arguments, gwjob.cmdvals, gwjob.name, []
     )
     return pseudo_filename
 
@@ -251,8 +252,18 @@ def _make_doma_work(config, generic_workflow, gwjob, task_count, task_chunk):
     else:
         job_executable = gwjob.executable.src_uri
     cmd_line_embedder = CommandLineEmbedder(config)
+    _LOG.debug(
+        "job %s inputs = %s, outputs = %s",
+        gwjob.name,
+        generic_workflow.get_job_inputs(gwjob.name),
+        generic_workflow.get_job_outputs(gwjob.name),
+    )
+
     cmd_line, _ = cmd_line_embedder.substitute_command_line(
-        job_executable + " " + gwjob.arguments, gwjob.cmdvals, gwjob.name
+        job_executable + " " + gwjob.arguments,
+        gwjob.cmdvals,
+        gwjob.name,
+        generic_workflow.get_job_inputs(gwjob.name) + generic_workflow.get_job_outputs(gwjob.name),
     )
 
     for gwfile in generic_workflow.get_job_inputs(gwjob.name, transfer_only=True):

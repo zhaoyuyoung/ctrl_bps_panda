@@ -67,6 +67,45 @@ class CommandLineEmbedder:
                 cmd_line = cmd_line.replace("{" + param_name + "}", param_val)
         return cmd_line
 
+    def replace_static_files(self, cmd_line, files):
+        """Substitute the FILE keys with values in the command line
+        which are static, the same for every job in the workflow and
+        could be defined once.
+
+        Parameters
+        ----------
+        cmd_line: `str`
+            command line to be processed
+        files: `list` [`lsst.ctrl.bps.GenericWorkflowFile`]
+            input and output files for the job.
+
+        Returns
+        -------
+        cmd : `str`
+            Processed command line.
+        """
+        # make copy of given command line for error message.
+        orig_cmd_line = cmd_line
+
+        # make gwfile lookup by name
+        files_by_name = {}
+        for gwfile in files:
+            files_by_name[gwfile.name] = gwfile
+
+        for file_key in re.findall(r"<FILE:([^>]+)>", cmd_line):
+            try:
+                gwfile = files_by_name[file_key]
+            except KeyError as e:
+                raise RuntimeError(
+                    "%s in command line, but corresponding file not given to function (%s)",
+                    file_key,
+                    orig_cmd_line,
+                ) from e
+
+            if not gwfile.wms_transfer and gwfile.job_access_remote:
+                cmd_line = cmd_line.replace(f"<FILE:{gwfile.name}>", gwfile.src_uri)
+        return cmd_line
+
     def resolve_submission_side_env_vars(self, cmd_line):
         """Substitute the lazy parameters in the command line
         which are defined and resolved on the submission side.
@@ -106,20 +145,20 @@ class CommandLineEmbedder:
             file_suffix += "+" + item + ":" + lazy_vars.get(item, "")
         return file_suffix
 
-    def substitute_command_line(self, cmd_line, lazy_vars, job_name):
-        """Preprocess the command line leaving for the egde node evaluation
-        only parameters which are job / environment dependent.
+    def substitute_command_line(self, cmd_line, lazy_vars, job_name, gwfiles):
+        """Preprocess the command line leaving for the edge node evaluation
+        only parameters which are job / environment dependent
 
         Parameters
         ----------
-        bps_file_name : `str`
-            Input file name proposed by BPS.
-        cmd_line : `str`
+        cmd_line: `str`
             Command line containing all lazy placeholders.
-        lazy_vars : `dict`
+        lazy_vars: `dict` [ `str`, `str` ]
             Lazy parameter name/values.
-        job_name : `str`
+        job_name: `str`
             Job name proposed by BPS.
+        gwfiles: `list` [`lsst.ctrl.bps.GenericWorkflowFile`]
+            Job files.
 
         Returns
         -------
@@ -135,5 +174,7 @@ class CommandLineEmbedder:
 
         cmd_line = self.replace_static_parameters(cmd_line, actual_lazy_vars)
         cmd_line = self.resolve_submission_side_env_vars(cmd_line)
+        if gwfiles:
+            cmd_line = self.replace_static_files(cmd_line, gwfiles)
         file_name = job_name + self.attach_pseudo_file_params(actual_lazy_vars)
         return cmd_line, file_name
