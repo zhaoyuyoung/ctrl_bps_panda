@@ -49,6 +49,8 @@ jobCleanup: ""
 # matched when selecting destination queue automatically.
 executionButler:
   queue: "DOMA_LSST_GOOGLE_MERGE"
+finalJob:
+  queue: "DOMA_LSST_GOOGLE_MERGE"
 
 pipetask:
   forcedPhotCoadd:

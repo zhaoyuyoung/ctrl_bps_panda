@@ -38,6 +38,10 @@ executionButler:
   requestMemory: 7000
   queue: "SLAC_Rubin_Merge"
 
+finalJob:
+  requestMemory: 7000
+  queue: "SLAC_Rubin_Merge"
+
 pipetask:
   pipetaskInit:
     requestMemory: 4000
