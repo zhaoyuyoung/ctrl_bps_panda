@@ -16,3 +16,6 @@ It provides a PanDA plugin for LSST PipelineTask execution framework, based on `
 
 
 PyPI: `lsst-ctrl-mpexec <https://pypi.org/project/lsst-ctrl-bps-panda/>`_
+
+This software is dual licensed under the GNU General Public License (version 3 of the License, or (at your option) any later version, and also under a 3-clause BSD license.
+Recipients may choose which of these licenses to use; please see the files gpl-3.0.txt and/or bsd_license.txt, respectively.
