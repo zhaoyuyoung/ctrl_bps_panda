@@ -31,6 +31,7 @@ import unittest
 
 from lsst.ctrl.bps import GenericWorkflowFile
 from lsst.ctrl.bps.panda.cmd_line_embedder import CommandLineEmbedder
+from lsst.ctrl.bps.panda.constants import PANDA_MAX_LEN_INPUT_FILE
 
 
 class TestCmdLineEmbedder(unittest.TestCase):
@@ -98,6 +99,16 @@ class TestCmdLineEmbedder(unittest.TestCase):
 
         self.assertEqual(orig_cmd_line, orig_cmd_line_copy)
         self.assertEqual(new_cmd_line, self.ans_cmd_line_2)
+
+    def testTooLongPseudoFilename(self):
+        cmd_line_embedder = CommandLineEmbedder({})
+        with self.assertRaises(RuntimeError):
+            _, _ = cmd_line_embedder.substitute_command_line("", {}, "j" * PANDA_MAX_LEN_INPUT_FILE, [])
+
+    def testOKPseudoFilename(self):
+        cmd_line_embedder = CommandLineEmbedder({})
+        _, name = cmd_line_embedder.substitute_command_line("", {}, "j" * 15, [])
+        self.assertIn("j" * 15, name)
 
 
 if __name__ == "__main__":
