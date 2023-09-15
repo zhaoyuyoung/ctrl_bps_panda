@@ -615,7 +615,7 @@ def copy_files_to_pandacache(filename):
     from pandaclient import Client
 
     status, out = Client.putFile(filename, True)
-    print("copy_files_to_pandacache: status: %s, out: %s" % (status, out))
+    print(f"copy_files_to_pandacache: status: {status}, out: {out}")
     if out.startswith("NewFileName:"):
         # found the same input sandbox to reuse
         filename = out.split(":")[-1]
@@ -649,6 +649,7 @@ def create_idds_build_workflow(config_file, config, remote_build):
     _LOG.info(type(remote_build))
     search_opt = {"replaceVars": True, "expandEnvVars": False, "replaceEnvVars": False, "required": False}
     cvals = {"LSST_VERSION": get_task_parameter(config, remote_build, "LSST_VERSION")}
+    cvals["custom_lsst_setup"] = get_task_parameter(config, remote_build, "custom_lsst_setup")
     search_opt["curvals"] = cvals
     _, executable = remote_build.search("runnerCommand", opt=search_opt)
     _LOG.info("executable: %s" % str(executable))

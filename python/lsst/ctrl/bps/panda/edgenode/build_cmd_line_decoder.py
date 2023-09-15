@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-This file is needed to decode the command line string sent from the BPS
+The file is needed to decode the command line string sent from the BPS
 plugin -> PanDA -> Edge node cluster management
 -> Edge node -> Container. This file is not a part
 of the BPS but a part of the payload wrapper.
@@ -30,6 +30,8 @@ _LOG = logging.getLogger(__name__)
 
 
 def download_extract_archive(filename):
+    """Download tar ball of files in the submission directory
+    """
     archive_basename = os.path.basename(filename)
     target_dir = os.getcwd()
     full_output_filename = os.path.join(target_dir, archive_basename)
@@ -44,17 +46,19 @@ def download_extract_archive(filename):
     from pandaclient import Client
 
     status, output = Client.getFile(archive_basename, output_path=full_output_filename)
-    print("Download archive file from pandacache status: %s, output: %s" % (status, output))
+    print(f"Download archive file from pandacache status: {status}, output: {output}")
     if status != 0:
         raise RuntimeError("Failed to download archive file from pandacache")
     with tarfile.open(full_output_filename, "r:gz") as f:
         f.extractall(target_dir)
-    print("Extract %s to %s" % (full_output_filename, target_dir))
+    print(f"Extract {full_output_filename} to {target_dir}")
     os.remove(full_output_filename)
     print("Remove %s" % full_output_filename)
 
 
 def create_idds_workflow(config_file):
+    """Create iDDS workflow
+    """
     _LOG.info("Starting building process")
     with time_this(
         log=_LOG,
@@ -66,6 +70,7 @@ def create_idds_workflow(config_file):
         mem_fmt=DEFAULT_MEM_FMT,
     ):
         wms_workflow_config, wms_workflow = prepare_driver(config_file)
+        '''
         _, when_create = wms_workflow_config.search(".executionButler.whenCreate")
         if when_create.upper() == "SUBMIT":
             _, execution_butler_dir = wms_workflow_config.search(".bps_defined.executionButlerDir")
@@ -79,6 +84,7 @@ def create_idds_workflow(config_file):
                     execution_butler_dir,
                     wms_workflow_config["submitPath"],
                 )
+        '''
     return wms_workflow_config, wms_workflow
 
 
@@ -98,8 +104,8 @@ if signature is None:
     print("IDDS_BUIL_SIGNATURE is not defined")
     sys.exit(-1)
 
-print("INFO: start {}".format(datetime.datetime.utcnow()))
-print("INFO: config file: {}".format(config_file))
+print(f"INFO: start {datetime.datetime.utcnow()}")
+print(f"INFO: config file: {format(config_file)}")
 
 current_dir = os.getcwd()
 
