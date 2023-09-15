@@ -2,6 +2,7 @@ remoteBuild:
   enabled: true
   requestMemory: 4096
   runnerCommand: >
+    export SHELL=/bin/bash;
     unset PYTHONPATH;
     source /cvmfs/sw.lsst.eu/linux-x86_64/lsst_distrib/{LSST_VERSION}/loadLSST.bash;
     pwd;ls -al;
