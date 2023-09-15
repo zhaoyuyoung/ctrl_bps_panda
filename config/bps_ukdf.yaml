@@ -19,8 +19,8 @@ payload:
 # Job environment setup
 custom_lsst_setup: ""
 setupLSSTEnv: >
-  unset PYTHONPATH;
   export SHELL=/bin/bash;
+  unset PYTHONPATH;
   source /cvmfs/sw.lsst.eu/linux-x86_64/lsst_distrib/{LSST_VERSION}/loadLSST.bash;
   setup lsst_distrib;
   {custom_lsst_setup}
