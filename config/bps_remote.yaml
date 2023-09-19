@@ -20,7 +20,7 @@ remoteBuild:
     export PANDA_VERIFY_HOST=off;
     export PANDA_SYS=$CONDA_PREFIX;
     export PANDA_URL_SSL=${PANDA_SERVER_URL}/server/panda;
-    export PANDACACHE_URL=$PANDA_URL_SSL;
+    export PANDACACHE_URL=$PANDA_SERVER_URL;
     export PANDA_URL=$PANDA_URL_SSL;
     {custom_lsst_setup}
     python3 ${CTRL_BPS_PANDA_DIR}/python/lsst/ctrl/bps/panda/edgenode/build_cmd_line_decoder.py _download_cmd_line_ _build_cmd_line_
